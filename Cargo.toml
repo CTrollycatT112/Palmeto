@@ -1,0 +1,22 @@
+[package]
+name = "palmeto"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "kernel"
+path = "src/kernel/main.rs"
+
+[dependencies]
+limine = "0.6"
+flanterm_bindings = "1"
+
+[profile.dev]
+panic = "abort"
+opt-level = 1
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+strip = "debuginfo"

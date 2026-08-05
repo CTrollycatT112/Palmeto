@@ -1,0 +1,19 @@
+[env]
+CARGO_UNSTABLE_JSON_TARGET_SPEC = "true"
+RUSTFLAGS = "-Zunstable-options"
+
+[unstable]
+build-std = ["core", "alloc", "compiler_builtins"]
+build-std-features = ["compiler-builtins-mem"]
+
+[build]
+target = "toolchain/aarch64-kernel.json"
+
+[target.'cfg(target_os = "none")']
+rustflags = [
+  "-C", "link-arg=-Ttoolchain/aarch64-linker.ld",
+  "-C", "link-arg=-nostdlib",
+  "-C", "link-arg=--no-dynamic-linker",
+  "-C", "link-arg=-z", "-C", "link-arg=max-page-size=0x1000",
+  "-C", "force-frame-pointers=yes",
+]
