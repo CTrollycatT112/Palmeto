@@ -3,10 +3,6 @@ name = "palmeto"
 version = "0.1.0"
 edition = "2024"
 
-[[bin]]
-name = "kernel"
-path = "src/kernel/main.rs"
-
 [dependencies]
 limine = "0.6"
 flanterm_bindings = "1"
@@ -20,3 +16,8 @@ panic = "abort"
 lto = true
 codegen-units = 1
 strip = "debuginfo"
+
+[features]
+default = ["qemu"]
+potato = []
+qemu = []

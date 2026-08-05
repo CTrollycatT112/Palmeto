@@ -4,7 +4,7 @@ override BUILD_PROFILE := dev
 override PROFILE_DIR   := $(if $(filter dev,$(BUILD_PROFILE)),debug,$(BUILD_PROFILE))
 
 KERNEL_DIR   := kernel
-KERNEL_BIN   := target/aarch64-kernel/$(PROFILE_DIR)/kernel
+KERNEL_BIN   := target/aarch64-kernel/$(PROFILE_DIR)/$(IMAGE_NAME)
 LIMINE_DIR   := limine
 IMAGE_DIR    := build/image
 IMAGE        := build/$(IMAGE_NAME).hdd
