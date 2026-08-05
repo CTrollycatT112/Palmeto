@@ -2,11 +2,9 @@
 #![no_main]
 
 mod drivers;
-
-use drivers::tty::serial::SerialHardware;
+mod arch;
 
 use core::panic::PanicInfo;
-use core::fmt::Write;
 
 use limine::request::HhdmRequest;
 
@@ -15,17 +13,17 @@ static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-    if let Some(hhdm_response) = HHDM_REQUEST.response() 
-    {
-        let mut serial = unsafe
-        {
-            SerialHardware::new(hhdm_response.offset)
-        };
+    arch::init();
+    
+    if let Some(hhdm_response) = HHDM_REQUEST.response() {
+        drivers::tty::serial::init(hhdm_response.offset);
+    }
 
-        let cpu_id = 0;
-        let _ = write!(serial, "KERNEL BOOTING...\n");
-        let _ = write!(serial, "CPU: #{}\n", cpu_id);
-        let _ = write!(serial, "OFFSET: {:#X}\n", hhdm_response.offset);
+    println!("\nKERNEL BOOTING...");
+    println!("CPU: #0");
+
+    if let Some(resp) = HHDM_REQUEST.response() {
+        println!("HHDM OFFSET: {:#X}", resp.offset);
     }
 
     loop {
@@ -33,7 +31,18 @@ pub extern "C" fn _start() -> ! {
     }
 }
 
+//
+// TODO:
+//  IMPLEMENT A LOGGER,
+//  AND PROPERLY PANIC,
+//  WITH WHAT WENT WRONG, AND MORE INFORMATION
+//
 #[panic_handler]
-pub fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+pub fn panic(info: &PanicInfo) -> ! {
+    println!("PANIC YOU NOOB....");
+    println!("{info}");
+
+    loop {
+        core::hint::spin_loop();
+    }
 }

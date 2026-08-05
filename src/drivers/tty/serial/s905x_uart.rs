@@ -12,7 +12,7 @@ use core::fmt;
 //
 pub const UART_BASE_ADDRESS: u64 = 0xC810_0400;
 
-const UART_WFIFO:   u64 = 0x0C;
+const UART_WFIFO:   u64 = 0x00;
 const UART_STATUS:  u64 = 0x0C;
 const UART_TX_FULL: u32 = 1 << 21;
 
@@ -44,10 +44,10 @@ impl S905xUart {
 
     pub fn write_str_raw(&self, string: &str) {
         for byte in string.bytes() {
-            self.write_byte(byte);
             if byte == b'\n' {
                 self.write_byte(b'\r');
             }
+            self.write_byte(byte);
         }
     }
 }

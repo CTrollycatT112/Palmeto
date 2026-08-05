@@ -44,10 +44,10 @@ impl Pl011Uart {
 
     pub fn write_str_raw(&self, string: &str) {
         for byte in string.bytes() {
-            self.write_byte(byte);
             if byte == b'\n' {
                 self.write_byte(b'\r');
             }
+            self.write_byte(byte);
         }
     }
 }
