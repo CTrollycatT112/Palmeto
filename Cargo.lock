@@ -74,6 +74,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "drivers"
+version = "0.1.0"
+
+[[package]]
 name = "either"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -108,6 +112,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
+]
+
+[[package]]
+name = "kernel"
+version = "0.1.0"
+dependencies = [
+ "drivers",
+ "flanterm_bindings",
+ "limine",
 ]
 
 [[package]]
@@ -158,14 +171,6 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
-]
-
-[[package]]
-name = "palmeto"
-version = "0.1.0"
-dependencies = [
- "flanterm_bindings",
- "limine",
 ]
 
 [[package]]

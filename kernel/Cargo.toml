@@ -1,0 +1,19 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "palmeto"
+path = "src/main.rs"
+
+[dependencies]
+limine = "0.6"
+flanterm_bindings = "1"
+
+drivers = { path = "../drivers" }
+
+[features]
+default = ["qemu"]
+potato = []
+qemu = []

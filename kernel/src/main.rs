@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-mod drivers;
 mod arch;
+
+use drivers::{print, println};
 
 use core::panic::PanicInfo;
 
