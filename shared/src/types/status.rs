@@ -1,11 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
 //
-// This kernel uses NTSTATUS style
-// UNIX like systems commonly use 'ERRNO'
-// There will be an ERRNO layer for system calls
-// But my KERNEL uses an NTSTATUS based system
-// This allows for more verbose error handling basically
+// Copyright (c) 2026 Palmeto OS Team
 //
-
+// Author:      Trollycat
+//
+// Module:      Status codes for return
+//
+// Description: This kernel uses NTSTATUS style
+//              UNIX like systems commonly use 'ERRNO'
+//              There will be an ERRNO layer for system calls
+//              But my KERNEL uses an NTSTATUS based system
+//              This allows for more verbose error handling
+//
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Status(pub u32);

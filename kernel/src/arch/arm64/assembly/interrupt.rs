@@ -1,6 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
 //
-// INTERRUPT WRAPPERS FOR ASSEMBLY
+// Copyright (c) 2026 Palmeto OS Team
 //
+// Author:      Trollycat
+//
+// Module:      Interrupt assembly wrappers
+//
+// Description: This file has assembly instruction wrappers,
+//              for interrupt handling...
+//              instructions.rs already has assembly wrappers,
+//              but this is another layer for clean 'interrupts'
+//
+
 #![allow(unused)]
 
 use super::instructions;

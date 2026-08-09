@@ -1,17 +1,23 @@
+// SPDX-License-Identifier: Apache-2.0
 //
-// This is the serial driver for QEMU emulation
+// Copyright (c) 2026 Palmeto OS Team
 //
+// Author:      Trollycat
+//
+// Module:      PL011 UART DRIVER
+//
+// Description: The PL011 UART DRIVER Is for QEMU aarch64              
+//
+
 use core::fmt;
 
 //
 // TODO:
-//   Right now, we hard-code the address
-//   later, we need to instead parse the DTB
-//   this is temporary, and works fine,
-//   but parsing the DTB is a much better way
-//
-pub const UART_BASE_ADDRESS: u64 = 0x0900_0000;
+//   1. PARSE DTB INSTEAD OF HARD-CODED ADDRESS
+//   2. USE RING BUFFERS INSTEAD OF WHATEVER THIS IS...
+//   3. USE A STANDARD 'SERIAL DRIVER' HEADER
 
+pub const UART_BASE_ADDRESS: u64 = 0x0900_0000;
 
 const PL011_DR:   u64 = 0x00;
 const PL011_FR:   u64 = 0x18;

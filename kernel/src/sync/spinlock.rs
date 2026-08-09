@@ -1,8 +1,15 @@
+// SPDX-License-Identifier: Apache-2.0
 //
-// Spinlocks are a method to make the processor loop over,
-// It will check if the lock is free,
-// Instead of putting a waiting task asleep
+// Copyright (c) 2026 Palmeto OS Team
 //
+// Author:      Trollycat
+//
+// Module:      Spinlock
+//
+// Description: A lock that spins in a loop until memory frees,
+//              Prevents CPU cores from writing data at the same time
+//
+
 use crate::arch::arm64::assembly::interrupt;
 
 use core::ops::{Deref, DerefMut};

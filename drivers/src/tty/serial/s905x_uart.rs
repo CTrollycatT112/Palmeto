@@ -1,15 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
 //
-// This is the serial driver for the libre potato board
+// Copyright (c) 2026 Palmeto OS Team
+//
+// Author:      Trollycat
+//
+// Module:      S905X UART DRIVER
+//
+// Description: The S905X UART DRIVER Is for libre potato              
 //
 use core::fmt;
 
 //
 // TODO:
-//   Right now, we hard-code the address
-//   later, we need to instead parse the DTB
-//   this is temporary, and works fine,
-//   but parsing the DTB is a much better way
-//
+//   1. PARSE DTB INSTEAD OF HARD-CODED ADDRESS
+//   2. USE RING BUFFERS INSTEAD OF WHATEVER THIS IS...
+//   3. USE A STANDARD 'SERIAL DRIVER' HEADER
+
+
 pub const UART_BASE_ADDRESS: u64 = 0xC810_0400;
 
 const UART_WFIFO:   u64 = 0x00;
