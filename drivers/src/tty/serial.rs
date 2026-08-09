@@ -1,6 +1,5 @@
-use kernel::sync::spinlock;
-
 use core::fmt::{self, Write};
+use spin::Mutex;
 
 #[cfg(feature = "potato")]
 pub mod s905x_uart;
@@ -14,8 +13,7 @@ pub mod pl011_uart;
 #[cfg(feature = "qemu")]
 pub use pl011_uart::Pl011Uart as SerialHardware;
 
-static SERIAL: 
-spinlock::SpinLock<Option<SerialHardware>> = spinlock::SpinLock::new(None);
+static SERIAL: Mutex<Option<SerialHardware>> = Mutex::new(None);
 
 pub fn init(hhdm_offset: u64) {
     let uart = unsafe { SerialHardware::new(hhdm_offset) };
@@ -27,8 +25,7 @@ pub fn init(hhdm_offset: u64) {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     let mut lock = SERIAL.lock();
-    if let Some(ref mut serial) = *lock
-    {
+    if let Some(ref mut serial) = *lock {
         let _ = serial.write_fmt(args);
     }
 }

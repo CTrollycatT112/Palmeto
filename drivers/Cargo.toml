@@ -7,6 +7,8 @@ edition = "2024"
 shared = { path = "../shared" }
 kernel = { path = "../kernel" }
 
+spin = { workspace = true }
+
 [features]
 default = ["qemu"]
 potato = ["kernel/potato"]
