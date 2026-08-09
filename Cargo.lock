@@ -144,6 +144,7 @@ dependencies = [
  "flanterm",
  "limine 0.6.5",
  "shared",
+ "spin",
 ]
 
 [[package]]

@@ -8,6 +8,8 @@ limine = { workspace = true }
 flanterm = { workspace = true }
 
 shared = { path = "../shared" }
+spin = { workspace = true }
+
 
 [features]
 default = ["qemu"]

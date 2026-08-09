@@ -14,20 +14,38 @@
 #![no_main]
 
 use kernel::arch;
-
-use drivers::{println};
-
+use drivers::println;
 use core::panic::PanicInfo;
-
-use limine::request::HhdmRequest;
+use limine::request::{HhdmRequest, ExecutableCmdlineRequest};
 
 #[used]
 static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+
+#[used]
+static CMDLINE_REQUEST: ExecutableCmdlineRequest = ExecutableCmdlineRequest::new();
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     arch::init();
     
+    if let Some(cmd_response) = CMDLINE_REQUEST.response() {
+        let raw_ptr: *const u8 = cmd_response.cmdline().as_ptr();
+
+        if !raw_ptr.is_null() {
+            let mut len = 0;
+            unsafe {
+                while *raw_ptr.offset(len) != 0 {
+                    len += 1;
+                }
+                
+                let byte_slice = core::slice::from_raw_parts(raw_ptr, len as usize);
+                if let Ok(cmd_str) = core::str::from_utf8(byte_slice) {
+                    kernel::cmdline::parse_and_store(cmd_str);
+                }
+            }
+        }
+    }
+
     if let Some(hhdm_response) = HHDM_REQUEST.response() {
         drivers::tty::serial::init(hhdm_response.offset);
     }
@@ -44,12 +62,6 @@ pub extern "C" fn _start() -> ! {
     }
 }
 
-//
-// TODO:
-//  IMPLEMENT A LOGGER,
-//  AND PROPERLY PANIC,
-//  WITH WHAT WENT WRONG, AND MORE INFORMATION
-//
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
     println!("PANIC YOU NOOB....");
