@@ -3,10 +3,11 @@ name = "drivers"
 version = "0.1.0"
 edition = "2024"
 
+[dependencies]
+shared = { path = "../shared" }
+kernel = { path = "../kernel" }
+
 [features]
 default = ["qemu"]
-potato = []
-qemu = []
-
-[dependencies]
-shared  = { path = "../shared"  }
+potato = ["kernel/potato"]
+qemu = ["kernel/qemu"]

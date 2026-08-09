@@ -1,4 +1,4 @@
-use shared::sync::spinlock;
+use kernel::sync::spinlock;
 
 use core::fmt::{self, Write};
 

@@ -1,0 +1,21 @@
+[package]
+name = "boot"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "palmeto"
+path = "src/main.rs"
+
+[dependencies]
+limine = "0.6"
+flanterm_bindings = "1"
+
+shared = { path = "../shared" }
+kernel = { path = "../kernel" }
+drivers = { path = "../drivers" }
+
+[features]
+default = ["qemu"]
+potato = ["drivers/potato", "kernel/potato"]
+qemu = ["drivers/qemu", "kernel/qemu"]

@@ -1,7 +1,9 @@
 [workspace]
 members = [
     "kernel",
-    "drivers"
+    "drivers",
+    "shared",
+    "boot",
 ]
 resolver = "2"
 

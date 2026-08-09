@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use shared::arch;
+use kernel::arch;
 
 use drivers::{println};
 

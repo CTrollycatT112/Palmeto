@@ -3,16 +3,9 @@ name = "kernel"
 version = "0.1.0"
 edition = "2024"
 
-[[bin]]
-name = "palmeto"
-path = "src/main.rs"
-
 [dependencies]
+shared = { path = "../shared" }
 limine = "0.6"
-flanterm_bindings = "1"
-
-drivers = { path = "../drivers" }
-shared  = { path = "../shared"  }
 
 [features]
 default = ["qemu"]
