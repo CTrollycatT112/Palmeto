@@ -323,14 +323,14 @@ vector_table el1
 vector_table el2
 vector_table el3
             "#,
-            sync_current = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::sync_current,
-            irq_current = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::irq_current,
-            fiq_current = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::fiq_current,
-            serror_current = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::serror_current,
-            sync_lower = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::sync_lower,
-            irq_lower = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::irq_lower,
-            fiq_lower = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::fiq_lower,
-            serror_lower = sym <$handlers as $crate::arch::arm64::exceptions::ExceptionHandlers>::serror_lower,
+            sync_current = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::sync_current,
+            irq_current = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::irq_current,
+            fiq_current = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::fiq_current,
+            serror_current = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::serror_current,
+            sync_lower = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::sync_lower,
+            irq_lower = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::irq_lower,
+            fiq_lower = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::fiq_lower,
+            serror_lower = sym <$handlers as $crate::arch::arm64::exception::exceptions::ExceptionHandlers>::serror_lower,
         );
     };
 }

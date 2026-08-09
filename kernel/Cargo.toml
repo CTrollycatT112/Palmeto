@@ -12,6 +12,7 @@ limine = "0.6"
 flanterm_bindings = "1"
 
 drivers = { path = "../drivers" }
+shared  = { path = "../shared"  }
 
 [features]
 default = ["qemu"]

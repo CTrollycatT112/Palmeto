@@ -1,9 +1,9 @@
 #![no_std]
 #![no_main]
 
-mod arch;
+use shared::arch;
 
-use drivers::{print, println};
+use drivers::{println};
 
 use core::panic::PanicInfo;
 

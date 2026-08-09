@@ -1,3 +1,5 @@
+use shared::sync::spinlock;
+
 use core::fmt::{self, Write};
 
 #[cfg(feature = "potato")]
@@ -12,24 +14,22 @@ pub mod pl011_uart;
 #[cfg(feature = "qemu")]
 pub use pl011_uart::Pl011Uart as SerialHardware;
 
-struct UnsafeSerial(Option<SerialHardware>);
-unsafe impl Sync for UnsafeSerial {}
-
-static mut SERIAL: UnsafeSerial = UnsafeSerial(None);
+static SERIAL: 
+spinlock::SpinLock<Option<SerialHardware>> = spinlock::SpinLock::new(None);
 
 pub fn init(hhdm_offset: u64) {
     let uart = unsafe { SerialHardware::new(hhdm_offset) };
-    unsafe {
-        SERIAL.0 = Some(uart);
-    }
+
+    let mut lock = SERIAL.lock();
+    *lock = Some(uart);
 }
 
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
-    unsafe {
-        if let Some(ref mut serial) = SERIAL.0 {
-            let _ = serial.write_fmt(args);
-        }
+    let mut lock = SERIAL.lock();
+    if let Some(ref mut serial) = *lock
+    {
+        let _ = serial.write_fmt(args);
     }
 }
 
