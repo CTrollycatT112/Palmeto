@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+limine = { workspace = true }
+flanterm = { workspace = true }
+
 shared = { path = "../shared" }
-limine = "0.6"
 
 [features]
 default = ["qemu"]

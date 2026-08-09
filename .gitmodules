@@ -1,0 +1,6 @@
+[submodule "bindings/limine-rs"]
+	path = bindings/limine-rs
+	url = https://github.com/robotman2412/limine-boot-rust
+[submodule "bindings/flanterm-rs"]
+	path = bindings/flanterm-rs
+	url = https://github.com/robotman2412/flanterm-rs

@@ -7,6 +7,10 @@ members = [
 ]
 resolver = "2"
 
+[workspace.dependencies]
+limine = { path = "bindings/limine-rs" }
+flanterm = { path = "bindings/flanterm-rs" }
+
 [profile.dev]
 panic = "abort"
 opt-level = 1

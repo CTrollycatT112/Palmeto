@@ -44,7 +44,7 @@ dependencies = [
  "drivers",
  "flanterm_bindings",
  "kernel",
- "limine",
+ "limine 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "shared",
 ]
 
@@ -105,6 +105,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
 
 [[package]]
+name = "flanterm"
+version = "0.0.1"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "flanterm_bindings"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -133,7 +140,8 @@ dependencies = [
 name = "kernel"
 version = "0.1.0"
 dependencies = [
- "limine",
+ "flanterm",
+ "limine 0.6.5",
  "shared",
 ]
 
@@ -151,6 +159,13 @@ checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
 dependencies = [
  "cfg-if",
  "windows-link",
+]
+
+[[package]]
+name = "limine"
+version = "0.6.5"
+dependencies = [
+ "uuid",
 ]
 
 [[package]]
@@ -282,6 +297,12 @@ name = "unicode-ident"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+
+[[package]]
+name = "uuid"
+version = "1.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf3923a6f5c4c6382e0b653c4117f48d631ea17f38ed86e2a828e6f7412f5239"
 
 [[package]]
 name = "windows-link"
