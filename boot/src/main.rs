@@ -13,19 +13,25 @@
 #![no_std]
 #![no_main]
 
+mod reloc;
+mod request;
+
 use kernel::arch;
+
 use drivers::println;
+
 use core::panic::PanicInfo;
-use limine::request::{HhdmRequest, ExecutableCmdlineRequest};
 
-#[used]
-static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
-
-#[used]
-static CMDLINE_REQUEST: ExecutableCmdlineRequest = ExecutableCmdlineRequest::new();
+use request::{HHDM_REQUEST, CMDLINE_REQUEST};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
+    let runtime_pc: u64;
+    unsafe {
+        core::arch::asm!("adrp {}, .", out(reg) runtime_pc);
+        reloc::apply_runtime_relocations(runtime_pc);
+    }
+
     arch::init();
     
     if let Some(cmd_response) = CMDLINE_REQUEST.response() {

@@ -13,9 +13,11 @@
 
   "panic-strategy": "abort",
   "disable-redzone": true,
-  "relocation-model": "static",
-
-  "code-model": "large",
+  
+  "relocation-model": "pie",
+  "code-model": "small",
+  "position-independent-executables": true,
+  "dynamic-linking": true,
 
   "features": "+strict-align,-neon,-fp-armv8",
   "abi": "softfloat",
