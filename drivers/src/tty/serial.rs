@@ -1,4 +1,5 @@
 use core::fmt::{self, Write};
+use shared::types::status::{KResult, Status};
 use spin::Mutex;
 
 pub mod pl011_uart;
@@ -31,48 +32,27 @@ impl fmt::Write for SerialDevice {
 
 static SERIAL: Mutex<Option<SerialDevice>> = Mutex::new(None);
 
-pub fn init_from_dtb(dtb_ptr: *const u8, hhdm_offset: u64) -> bool {
-    if dtb_ptr.is_null() {
-        return false;
-    }
-
-    let fdt = match unsafe { fdt::Fdt::from_ptr(dtb_ptr) } {
-        Ok(fdt) => fdt,
-        Err(_) => return false,
-    };
-
-    for node in fdt.all_nodes() {
-        let Some(compatible) = node.compatible() else { continue };
-        let Some(reg) = node.reg().and_then(|mut r| r.next()) else { continue };
-
-        let phys_base = reg.starting_address as u64;
-        if phys_base == 0 {
-            continue;
-        }
-
-        let vaddr = phys_base + hhdm_offset;
-
-        for comp in compatible.all() {
-
-            let dev = match comp {
-                "arm,pl011" => {
-                    Some(SerialDevice::Pl011(unsafe { Pl011Uart::new(vaddr) }))
-                }
-                "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => {
-                    Some(SerialDevice::S905x(unsafe { S905xUart::new(vaddr) }))
-                }
-                _ => None,
-            };
-
-            if let Some(uart) = dev {
-                let mut lock = SERIAL.lock();
-                *lock = Some(uart);
-                return true;
+pub fn init_from_dtb(compatible: &fdt::standard_nodes::Compatible, 
+                     vaddr: u64) -> KResult<()> {
+    for comp in compatible.all() {
+        let dev = match comp {
+            "arm,pl011" => {
+                Some(SerialDevice::Pl011(unsafe { Pl011Uart::new(vaddr) }))
             }
+            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => {
+                Some(SerialDevice::S905x(unsafe { S905xUart::new(vaddr) }))
+            }
+            _ => None,
+        };
+
+        if let Some(uart) = dev {
+            let mut lock = SERIAL.lock();
+            *lock = Some(uart);
+            return Ok(());
         }
     }
 
-    false
+    Err(Status::NOT_SUPPORTED)
 }
 
 #[doc(hidden)]

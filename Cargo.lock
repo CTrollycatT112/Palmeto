@@ -42,6 +42,7 @@ name = "boot"
 version = "0.1.0"
 dependencies = [
  "drivers",
+ "fdt",
  "flanterm_bindings",
  "kernel",
  "limine 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",

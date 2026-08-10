@@ -15,6 +15,7 @@
 
 mod reloc;
 mod request;
+mod dtbinit;
 
 use kernel::arch;
 use drivers::println;
@@ -37,15 +38,17 @@ pub extern "C" fn _start() -> ! {
             .map(|r| r.offset)
             .unwrap_or(0);
 
-    let serial_ok;
+    let mut serial_ok = false;
+    
     match DTB_REQUEST.response() 
     {
         Some(dtb_resp) => 
         {
             let dtb_ptr = dtb_resp.dtb_ptr as *const u8;
-            serial_ok = 
-                drivers::tty::serial::init_from_dtb
-                (dtb_ptr, hhdm_offset);
+
+            if let Ok(()) = dtbinit::init_dtb(dtb_ptr, hhdm_offset) {
+                serial_ok = true;
+            }
 
             if !serial_ok
             {

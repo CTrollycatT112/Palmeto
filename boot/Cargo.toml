@@ -14,3 +14,5 @@ flanterm_bindings = "1"
 shared = { path = "../shared" }
 kernel = { path = "../kernel" }
 drivers = { path = "../drivers" }
+
+fdt = { workspace = true }
