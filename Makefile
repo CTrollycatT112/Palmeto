@@ -76,7 +76,7 @@ iso: kernel limine
 
 run: image ovmf
 	qemu-system-aarch64 \
-		-M virt \
+		-M virt,acpi=off \
 		-cpu cortex-a72 \
 		-m 512M \
 		-drive file=build/ovmf/code.fd,if=pflash,format=raw,readonly=on \

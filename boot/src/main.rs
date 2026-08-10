@@ -17,12 +17,10 @@ mod reloc;
 mod request;
 
 use kernel::arch;
-
 use drivers::println;
+use request::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST};
 
 use core::panic::PanicInfo;
-
-use request::{HHDM_REQUEST, CMDLINE_REQUEST};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
@@ -33,7 +31,39 @@ pub extern "C" fn _start() -> ! {
     }
 
     arch::init();
-    
+
+    let hhdm_offset = HHDM_REQUEST
+            .response()
+            .map(|r| r.offset)
+            .unwrap_or(0);
+
+    let serial_ok;
+    match DTB_REQUEST.response() 
+    {
+        Some(dtb_resp) => 
+        {
+            let dtb_ptr = dtb_resp.dtb_ptr as *const u8;
+            serial_ok = 
+                drivers::tty::serial::init_from_dtb
+                (dtb_ptr, hhdm_offset);
+
+            if !serial_ok
+            {
+                //
+                // TODO:
+                //  ONCE FLANTERM IS WORKING,
+                //  WE SHOULD PRINT TO THE SCREEN INSTEAD,
+                //  BUT WE CAN'T PRINT TO CONSOLE,
+                //  AS THIS LITERALLY MEANS WE HAVE NO SERIAL..
+                //
+                core::hint::spin_loop();
+            }
+        }
+        None => {
+            core::hint::spin_loop();
+        }
+    }
+
     if let Some(cmd_response) = CMDLINE_REQUEST.response() {
         let raw_ptr: *const u8 = cmd_response.cmdline().as_ptr();
 
@@ -50,10 +80,6 @@ pub extern "C" fn _start() -> ! {
                 }
             }
         }
-    }
-
-    if let Some(hhdm_response) = HHDM_REQUEST.response() {
-        drivers::tty::serial::init(hhdm_response.offset);
     }
 
     println!("\nKERNEL BOOTING...");

@@ -8,10 +8,16 @@
 //
 // Description: This file handles limine requests
 //
-use limine::request::{HhdmRequest, ExecutableCmdlineRequest};
+use limine::request::{HhdmRequest, 
+                      DtbRequest,
+                      ExecutableCmdlineRequest
+};
 
 #[used]
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+
+#[used]
+pub static DTB_REQUEST: DtbRequest = DtbRequest::new();
 
 #[used]
 pub static CMDLINE_REQUEST: ExecutableCmdlineRequest = ExecutableCmdlineRequest::new();

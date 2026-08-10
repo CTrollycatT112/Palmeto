@@ -10,15 +10,6 @@
 //
 use core::fmt;
 
-//
-// TODO:
-//   1. PARSE DTB INSTEAD OF HARD-CODED ADDRESS
-//   2. USE RING BUFFERS INSTEAD OF WHATEVER THIS IS...
-//   3. USE A STANDARD 'SERIAL DRIVER' HEADER
-
-
-pub const UART_BASE_ADDRESS: u64 = 0xC810_0400;
-
 const UART_WFIFO:   u64 = 0x00;
 const UART_STATUS:  u64 = 0x0C;
 const UART_TX_FULL: u32 = 1 << 21;
@@ -28,9 +19,9 @@ pub struct S905xUart {
 }
 
 impl S905xUart {
-    pub const unsafe fn new(hhdm_offset: u64) -> Self {
+    pub const unsafe fn new(vaddr: u64) -> Self {
         Self {
-            vaddr: UART_BASE_ADDRESS + hhdm_offset,
+            vaddr
         }
     }
 

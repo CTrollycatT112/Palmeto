@@ -11,14 +11,6 @@
 
 use core::fmt;
 
-//
-// TODO:
-//   1. PARSE DTB INSTEAD OF HARD-CODED ADDRESS
-//   2. USE RING BUFFERS INSTEAD OF WHATEVER THIS IS...
-//   3. USE A STANDARD 'SERIAL DRIVER' HEADER
-
-pub const UART_BASE_ADDRESS: u64 = 0x0900_0000;
-
 const PL011_DR:   u64 = 0x00;
 const PL011_FR:   u64 = 0x18;
 const PL011_TXFF: u32 = 1 << 5;
@@ -28,14 +20,15 @@ pub struct Pl011Uart {
 }
 
 impl Pl011Uart {
-    pub const unsafe fn new(hhdm_offset: u64) -> Self {
+    pub const unsafe fn new(vaddr: u64) -> Self {
         Self {
-            vaddr: UART_BASE_ADDRESS + hhdm_offset,
+            vaddr
         }
     }
 
     pub fn write_byte(&self, byte: u8) {
         let uart_ptr = self.vaddr as *mut u32;
+        
         unsafe {
             let dr = uart_ptr.add((PL011_DR / 4) as usize);
             let fr = uart_ptr.add((PL011_FR / 4) as usize);

@@ -9,9 +9,3 @@ flanterm = { workspace = true }
 
 shared = { path = "../shared" }
 spin = { workspace = true }
-
-
-[features]
-default = ["qemu"]
-potato = []
-qemu = []
