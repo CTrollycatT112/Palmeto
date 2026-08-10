@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 limine = { workspace = true }
-flanterm = { workspace = true }
+flanterm = { workspace = true}
 
 shared = { path = "../shared" }
 spin = { workspace = true }

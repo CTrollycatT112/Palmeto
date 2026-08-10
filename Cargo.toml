@@ -9,7 +9,7 @@ resolver = "2"
 
 [workspace.dependencies]
 limine = { path = "bindings/limine-rs" }
-flanterm = { path = "bindings/flanterm-rs" }
+flanterm = { path = "bindings/flanterm-rs", default-features = false }
 
 spin = { version = "0.9.9", default-features = false, features = ["once", "mutex", "spin_mutex", "rwlock"] }
 fdt = "0.1.5"

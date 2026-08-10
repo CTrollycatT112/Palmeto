@@ -9,7 +9,6 @@ path = "src/main.rs"
 
 [dependencies]
 limine = "0.6"
-flanterm_bindings = "1"
 
 shared = { path = "../shared" }
 kernel = { path = "../kernel" }

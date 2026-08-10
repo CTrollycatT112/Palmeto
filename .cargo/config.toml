@@ -1,6 +1,7 @@
 [env]
 CARGO_UNSTABLE_JSON_TARGET_SPEC = "true"
 RUSTFLAGS = "-Zunstable-options"
+CC_aarch64_kernel = "aarch64-linux-gnu-gcc" 
 
 [unstable]
 build-std = ["core", "alloc", "compiler_builtins"]
