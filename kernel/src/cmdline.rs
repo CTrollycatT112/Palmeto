@@ -10,7 +10,7 @@
 //
 // kernel/src/cmdline.rs or drivers/src/cmdline.rs
 
-use shared::cmdline::config::BootConfiguration;
+use shared::cmdline::BootConfiguration;
 use spin::Once;
 
 pub static BOOT_OPTIONS: Once<BootConfiguration> = Once::new();

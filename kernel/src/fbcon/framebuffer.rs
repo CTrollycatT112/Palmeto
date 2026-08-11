@@ -2,15 +2,14 @@
 //
 // Copyright (c) 2026 Trollycat
 //
-// Purpose: This module handles the framebuffer and request
+// Purpose: This module implements the internal functions for the fbcon (framebuffer console),
+//          fbcon.rs is the public api,
+//          this is the engine.. Simple enough?
 //
 
 use spin::Mutex;
 
-#[used]
-#[unsafe(link_section = ".requests")]
-pub static FRAMEBUFFER_REQUEST: limine::request::FramebufferRequest =
-    limine::request::FramebufferRequest::new();
+use shared::requests::FRAMEBUFFER_REQUEST;
 
 pub static DRAW_LOCK: Mutex<()> = Mutex::new(());
 

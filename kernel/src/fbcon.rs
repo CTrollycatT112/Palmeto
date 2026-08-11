@@ -1,24 +1,50 @@
 // SPDX-License-Identifier: Apache-2.0
+//
+// Copyright (c) 2026 Trollycat
+//
+// Purpose: This module acts as the public API for fbcon (framebuffer console),
+//          It provides the write methods, the initialization method, and more,
+//          this file is very messy to be honest..
+//
 
+//
+// TODO:
+//  Some general cleanup in this area? Some things should not be here...
+//  I don't even like the way im initializating it,
+//  maybe after heap allocator rework will happen?
+//
+
+//
+// MODULES THAT WE NEED..
+//
 pub mod alloc;
 pub mod framebuffer;
 pub mod fbfont;
 
+//
+// STD AND EXTERNAL
+//
 use core::fmt::{self, Write};
 use spin::Mutex;
-
 use flanterm::fb::{FlantermFb, Font, Rotation};
 
+//
+// THIS PROJECT
+//
 use shared::color::{FBCON_COLOR_BLUE, FBCON_COLOR_WHITE};
-
+use shared::requests::FRAMEBUFFER_REQUEST;
 pub use framebuffer::{fill_display, query_framebuffer_information};
 
-use crate::fbcon::framebuffer::FRAMEBUFFER_REQUEST;
-
+//
+// CURSOR CONSTANTS
+//
 pub const HIDE_CURSOR: &str = "\x1b[?25l";
 pub const SHOW_CURSOR: &str = "\x1b[?25h";
 pub const CLEAR_SCREEN_HOME_CURSOR: &str = "\x1b[H\x1b[2J";
 
+//
+// Don't even ask...
+//
 pub struct TermWrapper(pub FlantermFb<'static>);
 unsafe impl Send for TermWrapper {}
 
@@ -29,6 +55,10 @@ pub fn initialize() {
     if let Some(resp) = FRAMEBUFFER_REQUEST.response()
         && let Some(fb) = resp.framebuffers().first()
     {
+        //
+        // BLUE for the true NT larp
+        // (Jokes aside, blue is a nice color for the background)
+        //
         fill_display(
             0,
             0,
@@ -37,9 +67,17 @@ pub fn initialize() {
             FBCON_COLOR_BLUE,
         );
 
+        //
+        // BACKGROUND        = BLUE
+        // FOREGROUND (TEXT) = WHITE
+        //
         let default_bg = FBCON_COLOR_BLUE;
         let default_fg = FBCON_COLOR_WHITE;
 
+        //
+        // DEFAULT FLANTERM FONT IS KIND OF UGLY...
+        // SWAP TO THE ONE DEFINED IN (fbfont.rs)
+        //
         let custom_font = Font {
             font: &fbfont::FBCON_DISPLAY_FONT.0,
             width: 8,
@@ -74,7 +112,7 @@ pub fn initialize() {
             0,
             Rotation::Rot0,
         )
-        .expect("Failed to initialize Flanterm");
+        .expect("FLANTERM_FAILED_TO_INITIALIZE");
 
         *FBCON_TERM.lock() = Some(TermWrapper(term));
 
