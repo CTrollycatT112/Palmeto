@@ -2,7 +2,11 @@
 //
 // Copyright (c) 2026 Trollycat
 //
-// Purpose: Color constants for FBCON
+// Purpose: Color constants for serial and fbcon
+//
+
+//
+// FBCON
 //
 pub const FBCON_COLOR_BLACK: u32 = 0x00000000;
 pub const FBCON_COLOR_BLUE: u32 = 0x000000AA;
@@ -20,3 +24,14 @@ pub const FBCON_COLOR_LIGHT_RED: u32 = 0x00FF5555;
 pub const FBCON_COLOR_LIGHT_MAGENTA: u32 = 0x00FF55FF;
 pub const FBCON_COLOR_YELLOW: u32 = 0x00FFFF55;
 pub const FBCON_COLOR_WHITE: u32 = 0x00FFFFFF;
+
+//
+// ANSI (SERIAL)
+//
+pub const ANSI_RESET: &str = "\x1b[0m";
+pub const ANSI_TRACE: &str = "\x1b[37m";
+pub const ANSI_DEBUG: &str = "\x1b[36m";
+pub const ANSI_INFO: &str = "\x1b[32m";
+pub const ANSI_WARN: &str = "\x1b[33m";
+pub const ANSI_ERROR: &str = "\x1b[31m";
+pub const ANSI_FATAL: &str = "\x1b[35m";

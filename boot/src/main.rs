@@ -12,12 +12,12 @@
 mod reloc;
 mod dtbinit;
 
+use shared::{debug, fatal, println};
+
 use shared::core::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST};
 
 use kernel::arch;
 use kernel::fbcon;
-
-use drivers::println;
 
 use core::panic::PanicInfo;
 
@@ -33,6 +33,8 @@ pub extern "C" fn _start() -> ! {
 
     fbcon::initialize();
     fbcon::reset_display();
+
+    debug!("FBCON INITIALIZED...");
 
     let hhdm_offset = HHDM_REQUEST
             .response()
@@ -53,18 +55,11 @@ pub extern "C" fn _start() -> ! {
 
             if !serial_ok
             {
-                //
-                // TODO:
-                //  ONCE FLANTERM IS WORKING,
-                //  WE SHOULD PRINT TO THE SCREEN INSTEAD,
-                //  BUT WE CAN'T PRINT TO CONSOLE,
-                //  AS THIS LITERALLY MEANS WE HAVE NO SERIAL..
-                //
-                core::hint::spin_loop();
+                fatal!("COULD NOT FIND SERIAL IN DTB");
             }
         }
         None => {
-            core::hint::spin_loop();
+            fatal!("COULD NOT GET DTB_RESPONSE");
         }
     }
 
@@ -81,24 +76,20 @@ pub extern "C" fn _start() -> ! {
                 let byte_slice = core::slice::from_raw_parts(raw_ptr, len as usize);
                 if let Ok(cmd_str) = core::str::from_utf8(byte_slice) {
                     kernel::cmdline::parse_and_store(cmd_str);
+                    debug!("COMMAND LINE ARGUMENTS: {}", cmd_str);
                 }
             }
         }
     }
 
-    //
-    // TODO:
-    //   USE LOGGER
-    //
-    println!("\nKERNEL BOOTING...");
-    println!("CPU: #0");
+    let resp = HHDM_REQUEST.response().unwrap_or_else(|| {
+        fatal!("COULD NOT GET HHDM_RESPONSE");
+    });
+    let _ = resp.offset;
 
-    if let Some(resp) = HHDM_REQUEST.response() {
-        //
-        // TODO:
-        //   USE LOGGER
-        //
-        println!("HHDM OFFSET: {:#X}", resp.offset);
+    for i in 0..51
+    {
+        debug!("VALUE: {}", i);
     }
 
     loop {
@@ -108,12 +99,9 @@ pub extern "C" fn _start() -> ! {
 
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
-    //
-    // TODO:
-    //   USE LOGGER
-    //
-    println!("PANIC YOU NOOB....");
-    println!("{info}");
+    println!("=========================");
+    println!("   KERNEL PANIC: ");
+    println!("          {info}       ");
 
     loop {
         core::hint::spin_loop();

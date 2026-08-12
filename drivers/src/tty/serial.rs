@@ -10,9 +10,12 @@
 //          wether to use 'PL011' or 'S905X'
 //
 
-use core::fmt::{self, Write};
-use shared::core::types::status::{KResult, Status};
+use core::fmt::{self};
+use shared::library::ulogger;
 use spin::Mutex;
+
+use shared::core::types::status::{KResult, Status};
+use shared::library::ulogger::sink::LogSink;
 
 #[derive(Clone, Copy)]
 pub struct UartConfig {
@@ -77,7 +80,23 @@ impl fmt::Write for Uart {
     }
 }
 
+pub struct SerialSink;
+
+impl LogSink for SerialSink {
+    fn write(&self, data: &[u8]) {
+        if let Some(uart) = SERIAL.lock().as_ref() {
+            for &byte in data {
+                if byte == b'\n' {
+                    uart.write_byte(b'\r');
+                }
+                uart.write_byte(byte);
+            }
+        }
+    }
+}
+
 static SERIAL: Mutex<Option<Uart>> = Mutex::new(None);
+pub static SERIAL_SINK: SerialSink = SerialSink;
 
 pub fn init_from_dtb(compatible: &fdt::standard_nodes::Compatible, vaddr: u64) -> KResult<()> {
     for comp in compatible.all() {
@@ -90,32 +109,12 @@ pub fn init_from_dtb(compatible: &fdt::standard_nodes::Compatible, vaddr: u64) -
         if let Some(cfg) = config {
             let uart = unsafe { Uart::new(vaddr, cfg) };
             *SERIAL.lock() = Some(uart);
+
+            ulogger::register_sink(&SERIAL_SINK)?;
+
             return Ok(());
         }
     }
 
     Err(Status::NOT_SUPPORTED)
-}
-
-#[doc(hidden)]
-pub fn _print(args: fmt::Arguments) {
-    if let Some(ref mut serial) = *SERIAL.lock() {
-        let _ = serial.write_fmt(args);
-    }
-}
-
-#[macro_export]
-macro_rules! print {
-    ($($arg:tt)*) => {
-        $crate::tty::serial::_print(format_args!($($arg)*));
-    };
-}
-
-#[macro_export]
-macro_rules! println {
-    () => ($crate::print!("\r\n"));
-    ($($arg:tt)*) => {
-        $crate::print!($($arg)*);
-        $crate::print!("\r\n");
-    };
 }

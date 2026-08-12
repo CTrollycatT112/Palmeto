@@ -31,7 +31,6 @@ use flanterm::fb::{FlantermFb, Font, Rotation};
 //
 // THIS PROJECT
 //
-use shared::core::color::{FBCON_COLOR_BLUE, FBCON_COLOR_WHITE};
 use shared::core::requests::FRAMEBUFFER_REQUEST;
 pub use framebuffer::{fill_display, query_framebuffer_information};
 
@@ -48,6 +47,25 @@ pub const CLEAR_SCREEN_HOME_CURSOR: &str = "\x1b[H\x1b[2J";
 pub struct TermWrapper(pub FlantermFb<'static>);
 unsafe impl Send for TermWrapper {}
 
+pub struct FbConsole;
+
+impl fmt::Write for FbConsole {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        write_string(s);
+        Ok(())
+    }
+}
+
+impl shared::library::ulogger::sink::LogSink for FbConsole {
+    fn write(&self, data: &[u8]) {
+        if let Ok(s) = core::str::from_utf8(data) {
+            write_string(s);
+        }
+    }
+}
+
+pub static FBCON_SINK: FbConsole = FbConsole;
+
 static FBCON_TERM: Mutex<Option<TermWrapper>> = Mutex::new(None);
 
 pub fn initialize() {
@@ -55,25 +73,6 @@ pub fn initialize() {
     if let Some(resp) = FRAMEBUFFER_REQUEST.response()
         && let Some(fb) = resp.framebuffers().first()
     {
-        //
-        // BLUE for the true NT larp
-        // (Jokes aside, blue is a nice color for the background)
-        //
-        fill_display(
-            0,
-            0,
-            fb.width as u32,
-            fb.height as u32,
-            FBCON_COLOR_BLUE,
-        );
-
-        //
-        // BACKGROUND        = BLUE
-        // FOREGROUND (TEXT) = WHITE
-        //
-        let default_bg = FBCON_COLOR_BLUE;
-        let default_fg = FBCON_COLOR_WHITE;
-
         //
         // DEFAULT FLANTERM FONT IS KIND OF UGLY...
         // SWAP TO THE ONE DEFINED IN (fbfont.rs)
@@ -105,9 +104,9 @@ pub fn initialize() {
             None,
             None,
             None,
-            Some(default_bg),
             None,
-            Some(default_fg),
+            None,
+            None,
             None,
             0,
             Rotation::Rot0,
@@ -115,6 +114,8 @@ pub fn initialize() {
         .expect("FLANTERM_FAILED_TO_INITIALIZE");
 
         *FBCON_TERM.lock() = Some(TermWrapper(term));
+
+        let _ = shared::library::ulogger::register_sink(&FBCON_SINK);
 
         write_string(HIDE_CURSOR);
     }
@@ -141,14 +142,5 @@ pub fn write_string(s: &str) {
                 let _ = wrapper.0.write_str(encoded);
             }
         }
-    }
-}
-
-pub struct FbConsole;
-
-impl fmt::Write for FbConsole {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
-        write_string(s);
-        Ok(())
     }
 }
