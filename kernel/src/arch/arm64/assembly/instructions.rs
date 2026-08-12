@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
+// Purpose: This file uses raw assembly instructions,
+//          wrapping them in functions,
+//          AARCH64 instructions are a little weird..
+//          I'm used to X86_64...
 //
-// Module:      AARCH64 Assembly Instructions
-//
-// Description: This file uses raw assembly instructions,
-//              wrapping them in functions,
-//              AARCH64 instructions are a little weird..
-//              I'm used to X86_64...
-//
+
 #![allow(unused)]
 
 use core::arch::{asm, global_asm};

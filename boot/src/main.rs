@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
-//
-// Module:      Entry point
-//
-// Description: This is the entry point file for the O/S,
-//              It contains "_start" (or sometimes known as 'kmain')
-//              It will handle VERY early initialization
+// Purpose: This is the entry point file for the O/S,
+//          It contains "_start"
+//          It will handle VERY early initialization
 
 #![no_std]
 #![no_main]

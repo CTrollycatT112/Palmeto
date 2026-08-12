@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
+// Purpose: This module parses the Device tree blob,
+//          each module will handle it's own detection,
+//          but this will be an 'interface',
+//          the main function only needs to call 'init_dtb',
+//          and the 'init_dtb' will call individual functions
 //
-// Module:      Device tree blob parser
-//
-// Description: This module parses the Device tree blob,
-//              each module will handle it's own detection,
-//              but this will be an 'interface',
-//              the main function only needs to call 'init_dtb',
-//              and the 'init_dtb' will call individual functions
-//
+
 use drivers::tty::serial;
 use shared::types::status::{KResult, Status};
 

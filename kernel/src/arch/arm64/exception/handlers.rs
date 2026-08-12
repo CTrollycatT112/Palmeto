@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
+// Purpose: This is where any exception handlers go,
+//          if you want a certain function called instead of panic,
+//          you register it here,
+//          said function will be called upon the exception
 //
-// Module:      Exception Handlers
-//
-// Description: This is where any exception handlers go,
-//              if you want a certain function called instead of panic,
-//              you register it here,
-//              said function will be called upon the exception
-//
-
 
 use crate::arch::arm64::exception::exceptions::{ExceptionHandlers, RegisterStateRef};
 use crate::exception_handlers;

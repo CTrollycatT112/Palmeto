@@ -1,13 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
+// Purpose: This file handles limine requests
 //
-// Module:      Limine request handler
-//
-// Description: This file handles limine requests
-//
+
 use limine::request::{HhdmRequest, 
                       DtbRequest,
                       ExecutableCmdlineRequest,

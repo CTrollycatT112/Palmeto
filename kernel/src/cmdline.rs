@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
+// Purpose: Parses the arguments passed into cmdline
 //
-// Module:      Limine command-line parser
-//
-// Description: Parses the arguments passed into cmdline
-//
-// kernel/src/cmdline.rs or drivers/src/cmdline.rs
 
 use shared::cmdline::BootConfiguration;
 use spin::Once;

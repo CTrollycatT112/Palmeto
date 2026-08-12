@@ -1,3 +1,15 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright (c) 2026 Trollycat
+//
+// Purpose: This module act's as a shared UART driver,
+//          once we make more drivers or configure properly,
+//          we will split this up into an abstract module,
+//          but for now this file handles the 2 UART drivers.
+//          it's chosen by the DTB,
+//          wether to use 'PL011' or 'S905X'
+//
+
 use core::fmt::{self, Write};
 use shared::types::status::{KResult, Status};
 use spin::Mutex;

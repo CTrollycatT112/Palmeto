@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright (c) 2026 Palmeto OS Team
+// Copyright (c) 2026 Trollycat
 //
-// Author:      Trollycat
-//
-// Module:      Relocation Handler
-//
-// Description: Instead of booting from 0xffffffff80000000,
-//              modern kernels use 'relocation',
-//              the problem is hackers could easily attack,
-//              since the address is always 0xffffffff80000000,
-//              relocating solves this issue,
-//              by booting from a random address everytime
-//
+// Purpose: Instead of booting from 0xffffffff80000000,
+//          modern kernels use 'relocation',
+//          the problem is hackers could easily attack,
+//          since the address is always 0xffffffff80000000,
+//          relocating solves this issue,
+//          by booting from a random address everytime
 
 #[repr(C)]
 struct Elf64Rela {
