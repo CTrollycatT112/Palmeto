@@ -9,7 +9,7 @@
 
 use spin::Mutex;
 
-use shared::requests::FRAMEBUFFER_REQUEST;
+use shared::core::requests::FRAMEBUFFER_REQUEST;
 
 pub static DRAW_LOCK: Mutex<()> = Mutex::new(());
 

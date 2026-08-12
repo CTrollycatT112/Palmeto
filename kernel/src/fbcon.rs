@@ -31,8 +31,8 @@ use flanterm::fb::{FlantermFb, Font, Rotation};
 //
 // THIS PROJECT
 //
-use shared::color::{FBCON_COLOR_BLUE, FBCON_COLOR_WHITE};
-use shared::requests::FRAMEBUFFER_REQUEST;
+use shared::core::color::{FBCON_COLOR_BLUE, FBCON_COLOR_WHITE};
+use shared::core::requests::FRAMEBUFFER_REQUEST;
 pub use framebuffer::{fill_display, query_framebuffer_information};
 
 //

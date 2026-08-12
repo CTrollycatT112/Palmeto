@@ -12,7 +12,7 @@
 mod reloc;
 mod dtbinit;
 
-use shared::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST};
+use shared::core::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST};
 
 use kernel::arch;
 use kernel::fbcon;
@@ -30,6 +30,9 @@ pub extern "C" fn _start() -> ! {
     }
 
     arch::init();
+
+    fbcon::initialize();
+    fbcon::reset_display();
 
     let hhdm_offset = HHDM_REQUEST
             .response()
@@ -83,15 +86,20 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
+    //
+    // TODO:
+    //   USE LOGGER
+    //
     println!("\nKERNEL BOOTING...");
     println!("CPU: #0");
 
     if let Some(resp) = HHDM_REQUEST.response() {
+        //
+        // TODO:
+        //   USE LOGGER
+        //
         println!("HHDM OFFSET: {:#X}", resp.offset);
     }
-
-    fbcon::initialize();
-    fbcon::reset_display();
 
     loop {
         core::hint::spin_loop();
@@ -100,6 +108,10 @@ pub extern "C" fn _start() -> ! {
 
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
+    //
+    // TODO:
+    //   USE LOGGER
+    //
     println!("PANIC YOU NOOB....");
     println!("{info}");
 

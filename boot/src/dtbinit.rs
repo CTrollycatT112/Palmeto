@@ -10,7 +10,7 @@
 //
 
 use drivers::tty::serial;
-use shared::types::status::{KResult, Status};
+use shared::core::types::status::{KResult, Status};
 
 pub fn init_dtb(dtb: *const u8, 
                 hhdm_offset: u64

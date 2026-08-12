@@ -5,7 +5,7 @@
 // Purpose: Parses the arguments passed into cmdline
 //
 
-use shared::cmdline::BootConfiguration;
+use shared::core::cmdline::BootConfiguration;
 use spin::Once;
 
 pub static BOOT_OPTIONS: Once<BootConfiguration> = Once::new();

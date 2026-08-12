@@ -11,7 +11,7 @@
 //
 
 use core::fmt::{self, Write};
-use shared::types::status::{KResult, Status};
+use shared::core::types::status::{KResult, Status};
 use spin::Mutex;
 
 #[derive(Clone, Copy)]
