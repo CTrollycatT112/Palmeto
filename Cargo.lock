@@ -3,17 +3,6 @@
 version = 4
 
 [[package]]
-name = "boot"
-version = "0.1.0"
-dependencies = [
- "drivers",
- "fdt",
- "kernel",
- "limine 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "shared",
-]
-
-[[package]]
 name = "cc"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -50,6 +39,17 @@ name = "flanterm"
 version = "0.0.1"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "init"
+version = "0.1.0"
+dependencies = [
+ "drivers",
+ "fdt",
+ "kernel",
+ "limine 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "shared",
 ]
 
 [[package]]

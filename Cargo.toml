@@ -3,7 +3,7 @@ members = [
     "kernel",
     "drivers",
     "shared",
-    "boot",
+    "init",
 ]
 resolver = "2"
 
