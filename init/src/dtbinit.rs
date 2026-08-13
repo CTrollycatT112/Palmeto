@@ -29,20 +29,12 @@ pub fn init_dtb(dtb: *const u8,
     for node in fdt.all_nodes()
     {
         let Some(compatible) = node.compatible() else { continue };
-        let Some(reg) = node.reg().and_then(|mut r| r.next()) else {continue};
 
-        let phys = reg.starting_address as u64;
-        if phys == 0
+        if compatible.all().any(|c| serial::COMPATIBLE_STRINGS.contains(&c))
         {
-            continue;
-        }
-
-        let vaddr = phys + hhdm_offset;
-
-        if let Ok(()) = serial::init_from_dtb(&compatible, vaddr) {
-            return Ok(());
+            serial::try_init_node(&node, hhdm_offset)?;
         }
     }
 
-    Err(Status::NO_SUCH_DEVICE)
+    Ok(())
 }

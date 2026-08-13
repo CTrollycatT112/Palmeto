@@ -11,11 +11,27 @@
 //
 
 use core::fmt::{self};
-use shared::library::ulogger;
 use spin::Mutex;
 
+//
+// !!! SHARED IMPORTS
+//
 use shared::core::types::status::{KResult, Status};
-use shared::library::ulogger::sink::LogSink;
+use shared::library::ulogger::sink::{register_sink, LogSink};
+
+//
+// COMPATIBLE DTB STRINGS
+//
+//  "arm,pl011"                 = QEMU SERIAL
+//  "amlogic,meson-s905-uart"   = POTATO SERIAL
+//  "amlogic,meson-gx-uart"     = FALLBACK FOR POTATO SERIAL
+//
+pub const COMPATIBLE_STRINGS: &[&str] = &
+[
+    "arm,pl011",
+    "amlogic,meson-gx-uart",
+    "amlogic,meson-s905-uart",
+];
 
 #[derive(Clone, Copy)]
 pub struct UartConfig {
@@ -98,23 +114,37 @@ impl LogSink for SerialSink {
 static SERIAL: Mutex<Option<Uart>> = Mutex::new(None);
 pub static SERIAL_SINK: SerialSink = SerialSink;
 
-pub fn init_from_dtb(compatible: &fdt::standard_nodes::Compatible, vaddr: u64) -> KResult<()> {
+pub fn try_init_node(node:       &fdt::node::FdtNode,
+                     vaddr:      u64) -> KResult<()> 
+{
+    let Some(compatible) = node.compatible() else {
+        return Err(Status::NOT_SUPPORTED);
+    };
+
+    let mut config = None;
+
     for comp in compatible.all() {
-        let config = match comp {
-            "arm,pl011" => Some(UartConfig::PL011),
-            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => Some(UartConfig::S905X),
-            _ => None,
+        match comp {
+            "arm,pl011" => config = Some(UartConfig::PL011),
+            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => config = Some(UartConfig::S905X),
+            _ => {},
         };
-
-        if let Some(cfg) = config {
-            let uart = unsafe { Uart::new(vaddr, cfg) };
-            *SERIAL.lock() = Some(uart);
-
-            ulogger::register_sink(&SERIAL_SINK)?;
-
-            return Ok(());
-        }
     }
 
-    Err(Status::NOT_SUPPORTED)
+    let cfg = config.ok_or(Status::NOT_SUPPORTED)?;
+
+    let reg = node.reg().and_then(
+        |mut r| r.next()
+    ).ok_or(
+        Status::INVALID_DEVICE_REQUEST
+    )?;
+
+    let uart = unsafe {
+        Uart::new(reg.starting_address as u64 + vaddr, cfg)
+    };
+
+    *SERIAL.lock() = Some(uart);
+    register_sink(&SERIAL_SINK)?;
+
+    Ok(())
 }
