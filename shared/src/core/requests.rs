@@ -9,6 +9,7 @@ use limine::request::{HhdmRequest,
                       DtbRequest,
                       ExecutableCmdlineRequest,
                       FramebufferRequest,
+                      DateAtBootRequest
 };
 
 #[used]
@@ -26,3 +27,7 @@ pub static CMDLINE_REQUEST: ExecutableCmdlineRequest = ExecutableCmdlineRequest:
 #[used]
 #[unsafe(link_section = ".requests")]
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
+
+#[used]
+#[unsafe(link_section = ".requests")]
+pub static DATE_AT_BOOT_REQUEST: DateAtBootRequest = DateAtBootRequest::new();

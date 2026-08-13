@@ -87,6 +87,7 @@ run: image ovmf
 		-device ramfb \
 		-device virtio-gpu-pci \
 		-display gtk \
+		-rtc base=utc \
 		-serial stdio
 
 clean:
