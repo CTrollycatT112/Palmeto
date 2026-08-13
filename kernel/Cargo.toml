@@ -8,4 +8,5 @@ limine = { workspace = true }
 flanterm = { workspace = true}
 
 shared = { path = "../shared" }
-spin = { workspace = true }
+spin   = { workspace = true }
+fdt    = { workspace = true }

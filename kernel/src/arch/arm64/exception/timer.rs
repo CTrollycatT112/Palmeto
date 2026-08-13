@@ -7,6 +7,8 @@
 
 use core::arch::asm;
 use spin::Mutex;
+
+use shared::{debug};
 use shared::core::types::status::{KResult, Status};
 
 const US_PER_SEC: u64 = 1_000_000;
@@ -49,7 +51,36 @@ impl TimeState {
     }
 }
 
+pub const COMPATIBLE_STRINGS: &[&str] = &[
+    "arm,armv8-timer",
+    "arm,armv7-timer",
+];
+
 pub static TIME_STATE: Mutex<TimeState> = Mutex::new(TimeState::new());
+
+pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
+    debug!("FOUND TIMER...");
+
+    //
+    // TODO:
+    //  maybe move this?
+    //
+    if let Some(prop) = node.property("interrupts") 
+    {
+        for chunk in prop.value.chunks_exact(12) 
+        {
+            let irq_type = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+            let irq_id   = u32::from_be_bytes([chunk[4], chunk[5], chunk[6], chunk[7]]);
+            
+            debug!("IRQ... Type: {}, ID: {}", irq_type, irq_id);
+            
+            // TODO: Call GICV2?
+        }
+    }
+
+    init(1);
+    Ok(())
+}
 
 pub fn rd_cntfrq_el0() -> u64 {
     let v: u64;

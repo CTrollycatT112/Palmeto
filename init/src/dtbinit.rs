@@ -10,6 +10,8 @@
 //
 
 use drivers::tty::serial;
+use kernel::arch::arm64::exception::timer;
+
 use shared::core::types::status::{KResult, Status};
 
 pub fn init_dtb(dtb: *const u8, 
@@ -33,6 +35,11 @@ pub fn init_dtb(dtb: *const u8,
         if compatible.all().any(|c| serial::COMPATIBLE_STRINGS.contains(&c))
         {
             serial::try_init_node(&node, hhdm_offset)?;
+        }
+
+        if compatible.all().any(|c| timer::COMPATIBLE_STRINGS.contains(&c))
+        {
+            timer::try_init_node(&node)?;
         }
     }
 

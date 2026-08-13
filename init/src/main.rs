@@ -80,6 +80,8 @@ pub extern "C" fn _start() -> ! {
     }
 
     arch::init();
+    fbcon::initialize();
+    fbcon::reset_display();
 
     let hhdm_offset = HHDM_REQUEST
         .response()
@@ -108,8 +110,6 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
-    fbcon::initialize();
-    fbcon::reset_display();
     debug!("FBCON INITIALIZED...");
 
     _init_boot_time();
