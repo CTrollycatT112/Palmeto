@@ -12,14 +12,19 @@
 mod reloc;
 mod dtbinit;
 
-use kernel::arch::arm64::timer;
-use shared::{debug, fatal, println};
-
-use shared::core::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST, DATE_AT_BOOT_REQUEST};
-
 use kernel::arch;
 use kernel::fbcon;
+use kernel::arch::arm64::exception::timer;
 
+//
+// !!! SHARED IMPORTS
+//
+use shared::{debug, fatal, println};
+use shared::core::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST, DATE_AT_BOOT_REQUEST};
+
+//
+// !!! RUST IMPORTS
+//
 use core::panic::PanicInfo;
 
 pub fn _init_boot_time()
