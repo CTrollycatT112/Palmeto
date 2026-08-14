@@ -10,14 +10,22 @@
 //          wether to use 'PL011' or 'S905X'
 //
 
-use core::fmt::{self};
 use spin::Mutex;
+
+pub mod meson_uart;
+pub mod pl011uart;
 
 //
 // !!! SHARED IMPORTS
 //
 use shared::core::types::status::{KResult, Status};
 use shared::library::ulogger::sink::{register_sink, LogSink};
+
+//
+// !!! KERNEL IMPORTS
+//
+use kernel::arch::arm64::exception::intrcntrl;
+use kernel::arch::arm64::interrupts;
 
 //
 // COMPATIBLE DTB STRINGS
@@ -33,53 +41,13 @@ pub const COMPATIBLE_STRINGS: &[&str] = &
     "amlogic,meson-s905-uart",
 ];
 
-#[derive(Clone, Copy)]
-pub struct UartConfig {
-    pub dr_offset: u64,
-    pub status_offset: u64,
-    pub tx_full_mask: u32,
-}
+pub trait SerialDevice: Send + Sync {
 
-impl UartConfig {
-    pub const PL011: Self = Self {
-        dr_offset: 0x00,
-        status_offset: 0x18,
-        tx_full_mask: 1 << 5,
-    };
+    fn write_byte(&mut self, byte: u8);
+    fn read_byte(&mut self) -> Option<u8>;
+    fn enable_interrupts(&mut self);
 
-    pub const S905X: Self = Self {
-        dr_offset: 0x00,
-        status_offset: 0x0C,
-        tx_full_mask: 1 << 21,
-    };
-}
-
-pub struct Uart {
-    vaddr: u64,
-    config: UartConfig,
-}
-
-impl Uart {
-    pub const unsafe fn new(vaddr: u64, config: UartConfig) -> Self {
-        Self { vaddr, config }
-    }
-
-    pub fn write_byte(&self, byte: u8) {
-        let uart_ptr = self.vaddr as *mut u32;
-
-        unsafe {
-            let dr = uart_ptr.add((self.config.dr_offset / 4) as usize);
-            let status = uart_ptr.add((self.config.status_offset / 4) as usize);
-
-            while (core::ptr::read_volatile(status) & self.config.tx_full_mask) != 0 {
-                core::hint::spin_loop();
-            }
-
-            core::ptr::write_volatile(dr, byte as u32);
-        }
-    }
-
-    pub fn write_str_raw(&self, string: &str) {
+    fn write_str_raw(&mut self, string: &str) {
         for byte in string.bytes() {
             if byte == b'\n' {
                 self.write_byte(b'\r');
@@ -89,10 +57,36 @@ impl Uart {
     }
 }
 
-impl fmt::Write for Uart {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
-        self.write_str_raw(s);
-        Ok(())
+//
+// TODO:
+//  WE SHOULD USE BOX<> HERE INSTEAD,
+//  ONCE WE HAVE OUR HEAP ALLOCATOR..
+//
+pub enum ActiveSerial {
+    Pl011(pl011uart::Pl011Uart),
+    Meson(meson_uart::MesonUart),
+}
+
+impl SerialDevice for ActiveSerial {
+    fn write_byte(&mut self, byte: u8) {
+        match self {
+            Self::Pl011(uart) => uart.write_byte(byte),
+            Self::Meson(uart) => uart.write_byte(byte),
+        }
+    }
+
+    fn read_byte(&mut self) -> Option<u8> {
+        match self {
+            Self::Pl011(uart) => uart.read_byte(),
+            Self::Meson(uart) => uart.read_byte(),
+        }
+    }
+
+    fn enable_interrupts(&mut self) {
+        match self {
+            Self::Pl011(uart) => uart.enable_interrupts(),
+            Self::Meson(uart) => uart.enable_interrupts(),
+        }
     }
 }
 
@@ -100,7 +94,7 @@ pub struct SerialSink;
 
 impl LogSink for SerialSink {
     fn write(&self, data: &[u8]) {
-        if let Some(uart) = SERIAL.lock().as_ref() {
+        if let Some(uart) = GLOBAL_SERIAL.lock().as_mut() {
             for &byte in data {
                 if byte == b'\n' {
                     uart.write_byte(b'\r');
@@ -111,40 +105,56 @@ impl LogSink for SerialSink {
     }
 }
 
-static SERIAL: Mutex<Option<Uart>> = Mutex::new(None);
+pub static GLOBAL_SERIAL: Mutex<Option<ActiveSerial>> = Mutex::new(None);
 pub static SERIAL_SINK: SerialSink = SerialSink;
 
-pub fn try_init_node(node:       &fdt::node::FdtNode,
-                     vaddr:      u64) -> KResult<()> 
-{
+pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
     let Some(compatible) = node.compatible() else {
         return Err(Status::NOT_SUPPORTED);
     };
 
-    let mut config = None;
+    let reg = node.reg().and_then(|mut r| r.next()).ok_or(Status::INVALID_DEVICE_REQUEST)?;
+    
+    let base_vaddr = reg.starting_address as usize as u64 + vaddr;
+    let mut device: Option<ActiveSerial> = None;
 
     for comp in compatible.all() {
         match comp {
-            "arm,pl011" => config = Some(UartConfig::PL011),
-            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => config = Some(UartConfig::S905X),
-            _ => {},
-        };
+            "arm,pl011" => {
+                let mut uart = pl011uart::Pl011Uart::new(base_vaddr);
+                uart.init();
+                uart.enable_interrupts();
+                device = Some(ActiveSerial::Pl011(uart));
+                break;
+            }
+            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => {
+                let mut uart = meson_uart::MesonUart::new(base_vaddr);
+                uart.init();
+                uart.enable_interrupts();
+                device = Some(ActiveSerial::Meson(uart));
+                break;
+            }
+            _ => {}
+        }
     }
 
-    let cfg = config.ok_or(Status::NOT_SUPPORTED)?;
+    let dev = device.ok_or(Status::NOT_SUPPORTED)?;
 
-    let reg = node.reg().and_then(
-        |mut r| r.next()
-    ).ok_or(
-        Status::INVALID_DEVICE_REQUEST
-    )?;
+    if let Ok(irq) = intrcntrl::parse_interrupt(node, 0)
+    {
+        interrupts::register_handler(irq,serial_interrupt_handler);
+        intrcntrl::enable_irq(irq);
+    }
 
-    let uart = unsafe {
-        Uart::new(reg.starting_address as u64 + vaddr, cfg)
-    };
-
-    *SERIAL.lock() = Some(uart);
+    *GLOBAL_SERIAL.lock() = Some(dev);
     register_sink(&SERIAL_SINK)?;
 
     Ok(())
+}
+
+pub fn serial_interrupt_handler() {
+    if let Some(dev) = GLOBAL_SERIAL.lock().as_mut() {
+        while let Some(_byte) = dev.read_byte() {
+        }
+    }
 }

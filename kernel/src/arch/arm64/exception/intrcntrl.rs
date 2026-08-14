@@ -99,6 +99,21 @@ pub fn read_and_ack_interrupt() -> u32 {
     }
 }
 
+pub fn parse_interrupt(node: &fdt::node::FdtNode, index: usize) -> KResult<usize> 
+{
+    let prop  = node.property("interrupts").ok_or(Status::FILE_CORRUPT_ERROR)?;
+    let chunk = prop.value.chunks_exact(12).nth(index).ok_or(Status::FILE_CORRUPT_ERROR)?;
+    
+    let irq_type = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+    let irq_id   = u32::from_be_bytes([chunk[4], chunk[5], chunk[6], chunk[7]]) as usize;
+    
+    match irq_type {
+        0 => Ok(irq_id + 32), // SPI...
+        1 => Ok(irq_id + 16), // PPI...
+        _ => Err(Status::FILE_CORRUPT_ERROR), // DOESN'T EXIST :P
+    }
+}
+
 pub fn end_of_interrupt(interrupt_id: u32) {
     unsafe {
         let base = *addr_of!(GICC_BASE);

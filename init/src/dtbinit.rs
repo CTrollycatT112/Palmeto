@@ -30,6 +30,16 @@ pub fn init_dtb(dtb: *const u8,
 
     for node in fdt.all_nodes()
     {
+        if let Some(compatible) = node.compatible() {
+            if compatible.all().any(|c| intrcntrl::COMPATIBLE_STRINGS.contains(&c)) 
+            {
+                intrcntrl::try_init_node(&node)?;
+                break;
+            }
+        }
+    }
+
+    for node in fdt.all_nodes() {
         let Some(compatible) = node.compatible() else { continue };
 
         let matches = |strings: &[&str]| compatible.all().any(|c| strings.contains(&c));
@@ -38,8 +48,6 @@ pub fn init_dtb(dtb: *const u8,
             serial::try_init_node(&node, hhdm_offset)?;
         } else if matches(timer::COMPATIBLE_STRINGS) {
             timer::try_init_node(&node)?;
-        } else if matches(intrcntrl::COMPATIBLE_STRINGS) {
-            intrcntrl::try_init_node(&node)?;
         }
     }
 
