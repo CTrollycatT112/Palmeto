@@ -112,7 +112,7 @@ pub unsafe fn cli() {
 #[inline]
 pub unsafe fn sti() {
     unsafe {
-        asm!("msr daifclr, #2");
+        asm!("msr daifclr, #2", options(nostack, preserves_flags));
     }
 }
 

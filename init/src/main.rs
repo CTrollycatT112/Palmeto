@@ -37,7 +37,6 @@ pub fn _init_boot_time()
         {
             Ok(()) =>
             {
-                debug!("BOOT TIME SYNED FROM LIMINE");
 
                 let mut dt = timer::DateTime
                 {
@@ -110,7 +109,6 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
-    debug!("FBCON INITIALIZED...");
 
     _init_boot_time();
 

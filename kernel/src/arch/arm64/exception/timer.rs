@@ -11,6 +11,9 @@ use spin::Mutex;
 use shared::{debug};
 use shared::core::types::status::{KResult, Status};
 
+use crate::arch::arm64::exception::intrcntrl;
+use crate::arch::arm64::interrupts;
+
 const US_PER_SEC: u64 = 1_000_000;
 const MS_PER_SEC: u64 = 1_000;
 const MS_PER_MIN: u64 = 60 * MS_PER_SEC;
@@ -58,24 +61,41 @@ pub const COMPATIBLE_STRINGS: &[&str] = &[
 
 pub static TIME_STATE: Mutex<TimeState> = Mutex::new(TimeState::new());
 
+pub fn timer_interrupt_hanlder()
+{
+    //
+    // 1-SECOND
+    //
+    reset(1000);
+}
+
 pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
     debug!("FOUND TIMER...");
 
+
     //
     // TODO:
-    //  maybe move this?
+    //  Kinda hard-coding the .nth(1)
+    //  It would be better to loop and find it
+    //  Because this might break on real hardware idk..
     //
     if let Some(prop) = node.property("interrupts") 
     {
-        for chunk in prop.value.chunks_exact(12) 
-        {
-            let irq_type = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
-            let irq_id   = u32::from_be_bytes([chunk[4], chunk[5], chunk[6], chunk[7]]);
-            
-            debug!("IRQ... Type: {}, ID: {}", irq_type, irq_id);
-            
-            // TODO: Call GICV2?
-        }
+        let chunk = prop.value.chunks_exact(12).nth(1).ok_or(Status::FILE_CORRUPT_ERROR)?;
+
+        let irq_type = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+        let irq_id   = u32::from_be_bytes([chunk[4], chunk[5], chunk[6], chunk[7]]) as usize;
+        
+        let absolute_irq = match irq_type {
+            0 => irq_id + 32,
+            1 => irq_id + 16,
+            _ => return Err(Status::FILE_CORRUPT_ERROR),
+        };
+
+        debug!("TIMER PPI {} TO GIC IRQ {}", irq_id, absolute_irq);
+
+        interrupts::register_handler(absolute_irq, timer_interrupt_hanlder);
+        intrcntrl::enable_irq(absolute_irq as usize);
     }
 
     init(1);
