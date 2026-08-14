@@ -61,7 +61,7 @@ pub const COMPATIBLE_STRINGS: &[&str] = &[
 
 pub static TIME_STATE: Mutex<TimeState> = Mutex::new(TimeState::new());
 
-pub fn timer_interrupt_hanlder()
+pub fn timer_interrupt_handler()
 {
     //
     // 1-SECOND
@@ -94,7 +94,7 @@ pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
 
         debug!("TIMER PPI {} TO GIC IRQ {}", irq_id, absolute_irq);
 
-        interrupts::register_handler(absolute_irq, timer_interrupt_hanlder);
+        interrupts::register_handler(absolute_irq, timer_interrupt_handler);
         intrcntrl::enable_irq(absolute_irq as usize);
     }
 
