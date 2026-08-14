@@ -96,6 +96,27 @@ pub unsafe fn read_tls_pointer() -> u64 {
 }
 
 #[inline]
+pub unsafe fn read_esr_el1() -> u64 {
+    let val: u64;
+    unsafe { asm!("mrs {0}, esr_el1", out(reg) val); }
+    val
+}
+
+#[inline]
+pub unsafe fn read_elr_el1() -> u64 {
+    let val: u64;
+    unsafe { asm!("mrs {0}, elr_el1", out(reg) val); }
+    val
+}
+
+#[inline]
+pub unsafe fn read_far_el1() -> u64 {
+    let val: u64;
+    unsafe { asm!("mrs {0}, far_el1", out(reg) val); }
+    val
+}
+
+#[inline]
 pub unsafe fn write_tls_pointer(value: u64) {
     unsafe {
         asm!("msr tpidr_el0, {0}", in(reg) value);

@@ -144,3 +144,20 @@ pub fn write_string(s: &str) {
         }
     }
 }
+
+//
+// This is sort of..
+// Stupid?
+//
+pub fn set_kern_panic_color() {
+    
+    if let Some(resp) = FRAMEBUFFER_REQUEST.response()
+        && let Some(fb) = resp.framebuffers().first()
+    {
+        let width: u32 = fb.width.try_into().unwrap();
+        let height: u32 = fb.height.try_into().unwrap();
+        fill_display(0, 0, width, height, 0x0000AAFF);
+    }
+
+    write_string("\x1b[44m\x1b[37m\x1b[2J\x1b[H");
+}
