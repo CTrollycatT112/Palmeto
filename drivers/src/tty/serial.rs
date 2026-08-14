@@ -18,6 +18,7 @@ pub mod pl011uart;
 //
 // !!! SHARED IMPORTS
 //
+use shared::core::ringbuf::RingBuffer;
 use shared::core::types::status::{KResult, Status};
 use shared::library::ulogger::sink::{register_sink, LogSink};
 
@@ -26,6 +27,7 @@ use shared::library::ulogger::sink::{register_sink, LogSink};
 //
 use kernel::arch::arm64::exception::intrcntrl;
 use kernel::arch::arm64::interrupts;
+use kernel::arch::arm64::assembly::interrupt;
 
 //
 // COMPATIBLE DTB STRINGS
@@ -106,6 +108,8 @@ impl LogSink for SerialSink {
 }
 
 pub static GLOBAL_SERIAL: Mutex<Option<ActiveSerial>> = Mutex::new(None);
+pub static SERIAL_RX_BUFFER: Mutex<RingBuffer<512>>   = Mutex::new(RingBuffer::new());
+
 pub static SERIAL_SINK: SerialSink = SerialSink;
 
 pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
@@ -154,7 +158,52 @@ pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
 
 pub fn serial_interrupt_handler() {
     if let Some(dev) = GLOBAL_SERIAL.lock().as_mut() {
-        while let Some(_byte) = dev.read_byte() {
+        while let Some(byte) = dev.read_byte()
+        {
+            let mut rxbuf = SERIAL_RX_BUFFER.lock();
+            let _ = rxbuf.push(byte);
         }
     }
+}
+
+pub fn read_char() -> Option<u8>
+{
+    //
+    // DISABLE INTERRUPTS
+    //
+    let state = unsafe {interrupt::save_and_disable_interrupts()};
+
+    //
+    // LOCK
+    //
+    let mut rxbuf = SERIAL_RX_BUFFER.lock();
+    
+    //
+    // Storage buffer
+    //
+    let mut dest  = [0u8; 1];
+
+    //
+    // IF THE BUFFER HAS A BYTE IN IT,
+    // WRITE IT INTO THE DEST[0]
+    //
+    let result = if rxbuf.read(&mut dest) > 0
+    {
+        Some(dest[0])
+    } else {
+        None
+    };
+
+    //
+    // We need to release the lock now,
+    // because we have to re-enable interrupts
+    //
+    drop(rxbuf);
+
+    //
+    // Turn interrupts back on
+    //
+    unsafe {interrupt::restore_interrupts(state)};
+
+    result
 }

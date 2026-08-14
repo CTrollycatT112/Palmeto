@@ -59,6 +59,33 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         }
     }
 
+    pub fn push(&mut self, byte: u8) -> bool
+    {
+
+        if self.full
+        {
+            //
+            // The buffer is full,
+            // We cannot add anything more..
+            //
+            return false;
+        }
+
+        self.data[self.head] = byte;
+        self.head            = (self.head + 1 ) % CAPACITY;
+
+        if self.head == self.tail
+        {
+            //
+            // HEAD == TAIL
+            // This means the buffer is full
+            //
+            self.full = true;
+        }
+
+        true
+    }
+
     pub fn read(&mut self, dest: &mut [u8]) -> usize
     {
         let mut count = 0;
