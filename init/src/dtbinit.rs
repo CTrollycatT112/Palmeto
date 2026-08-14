@@ -10,7 +10,7 @@
 //
 
 use drivers::tty::serial;
-use kernel::arch::arm64::exception::timer;
+use kernel::arch::arm64::exception::{timer, intrcntrl};
 
 use shared::core::types::status::{KResult, Status};
 
@@ -32,14 +32,14 @@ pub fn init_dtb(dtb: *const u8,
     {
         let Some(compatible) = node.compatible() else { continue };
 
-        if compatible.all().any(|c| serial::COMPATIBLE_STRINGS.contains(&c))
-        {
-            serial::try_init_node(&node, hhdm_offset)?;
-        }
+        let matches = |strings: &[&str]| compatible.all().any(|c| strings.contains(&c));
 
-        if compatible.all().any(|c| timer::COMPATIBLE_STRINGS.contains(&c))
-        {
+        if matches(serial::COMPATIBLE_STRINGS) {
+            serial::try_init_node(&node, hhdm_offset)?;
+        } else if matches(timer::COMPATIBLE_STRINGS) {
             timer::try_init_node(&node)?;
+        } else if matches(intrcntrl::COMPATIBLE_STRINGS) {
+            intrcntrl::try_init_node(&node)?;
         }
     }
 
