@@ -43,3 +43,18 @@ pub unsafe fn toggle_interrupts(state: bool) -> bool
         return instructions::toggle_interrupts(state);
     }
 }
+
+pub unsafe fn save_and_disable_interrupts() -> bool
+{
+    unsafe
+    {
+        instructions::toggle_interrupts(false)
+    }
+}
+
+pub unsafe fn restore_interrupts(previous_state: bool)
+{
+    unsafe {
+        instructions::toggle_interrupts(previous_state);
+    }
+}
