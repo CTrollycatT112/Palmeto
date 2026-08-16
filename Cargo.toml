@@ -8,8 +8,9 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-limine = { path = "bindings/limine-rs" }
+limine   = { path = "bindings/limine-rs" }
 flanterm = { path = "bindings/flanterm-rs", default-features = false }
+bitflags = "2.13.1"
 
 spin = { version = "0.9.9", default-features = false, features = ["once", "mutex", "spin_mutex", "rwlock"] }
 fdt = "0.1.5"

@@ -5,16 +5,16 @@
 // Purpose: This file handles limine requests
 //
 
-use limine::request::{HhdmRequest, 
-                      DtbRequest,
-                      ExecutableCmdlineRequest,
-                      FramebufferRequest,
-                      DateAtBootRequest
+use limine::request::{DateAtBootRequest, DtbRequest, ExecutableCmdlineRequest, FramebufferRequest, HhdmRequest, MemmapRequest
 };
 
 #[used]
 #[unsafe(link_section = ".requests")]
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+
+#[used]
+#[unsafe(link_section = ".requests")]
+pub static MEMMAP_REQUEST: MemmapRequest = MemmapRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
