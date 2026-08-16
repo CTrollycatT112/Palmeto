@@ -18,13 +18,17 @@ SECTIONS
     . = KERNEL_VMA;
 
     .text : {
+        __start_text = .;
         *(.text .text.*)
+        __stop_text = .;
     } :text
 
     . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .rodata : {
+        __start_rodata = .;
         *(.rodata .rodata.*)
+        __stop_rodata = .;
     } :rodata
 
     .requests_start_marker : {
@@ -49,9 +53,11 @@ SECTIONS
     . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .data : {
+        __start_data = .;
         *(.data .data.*)
         *(.got)
         *(.got.plt)
+        __stop_data = .;
     } :data
 
     .dynamic : {
@@ -61,8 +67,10 @@ SECTIONS
     } :data :dynamic
 
     .bss : {
+        __start_bss = .;
         *(COMMON)
         *(.bss .bss.*)
+        __stop_bss = .;
     } :data
 
     /DISCARD/ : {

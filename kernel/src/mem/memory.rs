@@ -25,17 +25,13 @@ pub static PFN_DATABASE_BASE: AtomicU64 = AtomicU64::new(0);
 pub static BIG_ALLOC_BASE:    AtomicU64 = AtomicU64::new(0);
 pub static STACK_ALLOC_BASE:  AtomicU64 = AtomicU64::new(0);
 
-bitflags!
-{
+bitflags! {
     #[derive(Clone, Copy)]
-    pub struct PteFlags: u64
-    {
+    pub struct PteFlags: u64 {
         const PRESENT     = 1 << 0;
         const TABLE_BLOCK = 1 << 1;
-
-        const WRITABLE    = 0;
-        const NO_EXECUTE  = 1 << 54;
         const ACCESSED    = 1 << 10;
         const SHAREABLE   = 3 << 8;
+        const NO_EXECUTE  = 1 << 54;
     }
 }
