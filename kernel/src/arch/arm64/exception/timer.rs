@@ -9,7 +9,7 @@ use core::arch::asm;
 use spin::Mutex;
 
 use shared::{debug};
-use shared::core::types::status::{KResult, Status};
+use shared::core::status::{KResult, Status};
 
 use crate::arch::arm64::exception::intrcntrl;
 use crate::arch::arm64::interrupts;

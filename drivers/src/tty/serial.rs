@@ -19,7 +19,7 @@ pub mod pl011uart;
 // !!! SHARED IMPORTS
 //
 use shared::core::ringbuf::RingBuffer;
-use shared::core::types::status::{KResult, Status};
+use shared::core::status::{KResult, Status};
 use shared::library::ulogger::sink::{register_sink, LogSink};
 
 //

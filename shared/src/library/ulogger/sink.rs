@@ -10,7 +10,7 @@
 //
 use spin::Mutex;
 
-use crate::core::types::status::{KResult, Status};
+use crate::core::status::{KResult, Status};
 
 //
 // Hard-coded 4 sink limit

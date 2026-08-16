@@ -12,7 +12,7 @@
 use drivers::tty::serial;
 use kernel::arch::arm64::exception::{timer, intrcntrl};
 
-use shared::core::types::status::{KResult, Status};
+use shared::core::status::{KResult, Status};
 
 pub fn init_dtb(dtb: *const u8, 
                 hhdm_offset: u64

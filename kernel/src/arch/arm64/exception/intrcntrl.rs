@@ -14,7 +14,7 @@
 //
 use core::ptr::{read_volatile, write_volatile, addr_of_mut, addr_of};
 
-use shared::core::types::status::{Status, KResult};
+use shared::core::status::{Status, KResult};
 use shared::{trace};
 
 static mut GICD_BASE: usize = 0;
