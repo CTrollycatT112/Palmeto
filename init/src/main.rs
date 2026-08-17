@@ -24,7 +24,10 @@ use kernel::arch::arm64::exception::timer;
 // !!! SHARED IMPORTS
 //
 use shared::{debug, fatal, println};
-use shared::core::requests::{HHDM_REQUEST, DTB_REQUEST, CMDLINE_REQUEST, DATE_AT_BOOT_REQUEST};
+use shared::core::requests::{HHDM_REQUEST, 
+                             DTB_REQUEST, 
+                             CMDLINE_REQUEST, 
+                             DATE_AT_BOOT_REQUEST};
 
 //
 // !!! RUST IMPORTS
@@ -75,7 +78,7 @@ pub fn _init_boot_time()
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-
+    
     let runtime_pc: u64;
     unsafe {
         core::arch::asm!("adrp {}, .", out(reg) runtime_pc);
