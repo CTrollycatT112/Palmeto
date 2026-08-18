@@ -135,6 +135,8 @@ impl LogSink for SerialSink
     ///
     fn write(&self, data: &[u8]) 
     {
+        let state = unsafe { interrupt::save_and_disable_interrupts() };
+
         if let Some(uart) = GLOBAL_SERIAL.lock().as_mut() 
         {
             for &byte in data 
@@ -146,6 +148,10 @@ impl LogSink for SerialSink
 
                 uart.write_byte(byte);
             }
+        }
+
+        unsafe {
+            interrupt::restore_interrupts(state);
         }
     }
 }

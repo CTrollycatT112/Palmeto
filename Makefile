@@ -57,7 +57,7 @@ kernel:
 limine:
 	if [ ! -d $(LIMINE_DIR) ]; then \
 	    git clone https://github.com/limine-bootloader/limine.git \
-	        --branch=v9.6.7-binary --depth=1 $(LIMINE_DIR); \
+	        --branch=v9.x-binary --depth=1 $(LIMINE_DIR); \
 	fi
 	$(MAKE) -C $(LIMINE_DIR)
 
