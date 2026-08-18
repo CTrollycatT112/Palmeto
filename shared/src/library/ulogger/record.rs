@@ -23,9 +23,12 @@ pub enum Level
 }
 
 impl Level {
-    //
-    // I MEAN...
-    //
+    ///
+    /// This routine converts the logging levels to a string,
+    /// so that you can print it out.
+    /// 
+    /// (Example: ) Trace => "TRACE"
+    ///
     pub const fn as_str(&self) -> &'static str
     {
         match self {
@@ -38,6 +41,10 @@ impl Level {
         }
     }
 
+    ///
+    /// This routine converts the logging levels to a color,
+    /// used for the logger.
+    ///
     pub const fn color_code(&self) -> &'static str
     {
         match self {

@@ -35,6 +35,15 @@ pub trait LogSink: Send + Sync
     fn write(&self, data: &[u8]);
 }
 
+///
+/// This routine registers a new logging sink,
+/// anything that wants standard log macros to print to it,
+/// needs to register as a sink.
+///
+/// # Arguments
+///
+/// * sink - A static reference to an object that has 'LogSink' trait
+///
 pub fn register_sink(sink: &'static dyn LogSink) -> KResult<()> 
 {
     let mut sinks = SINKS.lock();
@@ -49,6 +58,13 @@ pub fn register_sink(sink: &'static dyn LogSink) -> KResult<()>
     Err(Status::INSUFFICIENT_RESOURCES)
 }
 
+///
+/// This routine will dispatch a stream of log data to all registed sinks.
+///
+/// # Arguments
+///
+/// * data - A byte slice that has the log message to send to each sink
+///
 pub fn dispatch(data: &[u8]) {
 
     let sinks = SINKS.lock();

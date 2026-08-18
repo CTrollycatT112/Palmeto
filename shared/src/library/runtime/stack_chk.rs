@@ -11,6 +11,13 @@
 #[unsafe(no_mangle)]
 pub static __stack_chk_guard: usize = 0x5905_fde0_90cc_0aaf;
 
+///
+/// This rountine handles stack protector guard fails.
+/// 
+/// This routine will be automatically caleld by the compiler,
+/// if a stack smashing attack or buffer overflow happens,
+/// it will trigger a kernel panic.
+///
 #[unsafe(no_mangle)]
 pub extern "C" fn __stack_chk_fail() -> ! {
     panic!("__STACK_CHECK_FAIL");

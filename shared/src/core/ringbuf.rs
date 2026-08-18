@@ -20,6 +20,11 @@ pub struct RingBuffer<const CAPACITY: usize>
 
 impl<const CAPACITY: usize> RingBuffer<CAPACITY>
 {
+    ///
+    /// This routine consturcts a new RingBuffer structure,
+    /// it will  be completely empty,
+    /// besides setting the maximum capacity to the given one.
+    ///
     pub const fn new() -> Self
     {
         const
@@ -41,6 +46,15 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         }
     }
 
+    ///
+    /// This routine writes a slice of bytes to the buffer,
+    /// this will overwrite the oldest data in the buffer,
+    /// if the buffer is still full of course.
+    ///
+    /// # Arguments
+    ///
+    /// * bytes - A byte slice of data to write
+    ///
     pub fn write(&mut self, bytes: &[u8])
     {
         for &b in bytes
@@ -59,6 +73,14 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         }
     }
 
+    ///
+    /// This routines pushes a single byte into the buffer,
+    /// if the buffer is already full it will return from the function
+    ///
+    /// # Arguments
+    ///
+    /// * byte - The single byte to push into the buffer
+    ///
     pub fn push(&mut self, byte: u8) -> bool
     {
 
@@ -86,6 +108,15 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         true
     }
 
+    ///
+    /// This routine reads the available bytes from the buffer,
+    /// and place them into the destination,
+    /// it will return the number of bytes that were read.
+    ///
+    /// # Arguments
+    ///
+    /// * dest - Byte slice where read data will be stored
+    ///
     pub fn read(&mut self, dest: &mut [u8]) -> usize
     {
         let mut count = 0;
@@ -102,6 +133,11 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         count
     }
 
+    ///
+    /// This routine will completely clear the buffer.
+    /// Use if you no longer need the stored data
+    /// but you want to reuse the buffer.
+    ///
     pub fn clear(&mut self)
     {
         //
@@ -114,6 +150,9 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         self.full = false;
     }
 
+    ///
+    /// This routine returns the number of bytes in the buffer.
+    ///
     pub fn len(&self) -> usize
     {
         if self.full
@@ -127,16 +166,25 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
         }
     }
 
+    ///
+    /// This routine will return if the buffer is empty or not.
+    ///
     pub fn empty(&self) -> bool
     {
         !self.full && self.head == self.tail
     }
 
+    ///
+    /// This routine will return if the buffer is full or not.
+    ///
     pub fn full(&self) -> bool
     {
         self.full
     }
     
+    ///
+    /// This routine will return the maximum capacity of the buffer.
+    ///
     pub fn capacity(&self) -> usize
     {
         CAPACITY
@@ -144,6 +192,14 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
 }
 
 impl<const CAPACITY: usize> core::fmt::Write for RingBuffer<CAPACITY> {
+    ///
+    /// This routine will write a string slice into the buffer
+    /// converting it into bytes so that it works.
+    ///
+    /// # Arguments
+    ///
+    /// * s - the string to write
+    ///
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         self.write(s.as_bytes());
         Ok(())

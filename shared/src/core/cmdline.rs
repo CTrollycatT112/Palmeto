@@ -18,6 +18,16 @@ pub struct BootConfiguration
 
 impl Default for BootConfiguration
 {
+    ///
+    /// This routine is related to the 'Default' trait,
+    /// If the command line has no arguments,
+    /// it will use default settings.
+    /// 
+    /// These are:
+    ///     no limit to memory,
+    ///     multi-core allowed,
+    ///     serial-buad default (115200)
+    ///
     fn default() -> Self
     {
         Self
