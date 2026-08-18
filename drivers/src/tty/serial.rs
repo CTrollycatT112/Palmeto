@@ -10,10 +10,16 @@
 //          wether to use 'PL011' or 'S905X'
 //
 
-use spin::Mutex;
-
+//
+// !!! MODULES
+//
 pub mod meson_uart;
 pub mod pl011uart;
+
+//
+// !!! LIBRARY IMPORTS
+//
+use spin::Mutex;
 
 //
 // !!! SHARED IMPORTS
@@ -45,10 +51,33 @@ pub const COMPATIBLE_STRINGS: &[&str] = &
 
 pub trait SerialDevice: Send + Sync {
 
+    ///
+    /// This routines writes a single byte to the hardware.
+    ///
+    /// # Arguments
+    ///
+    /// * byte - The byte to write.
+    ///
     fn write_byte(&mut self, byte: u8);
+
+    ///
+    /// This routine reads a single byte from the hardware.
+    ///
     fn read_byte(&mut self) -> Option<u8>;
+
+    ///
+    /// This orutines enables hardware interrupts for serial.
+    ///
     fn enable_interrupts(&mut self);
 
+    ///
+    /// This routines writes a string slice directly to serial,
+    /// it will automatically handles 'n' and '\r\n'
+    ///
+    /// # Arguments
+    ///
+    /// * string - The string slice to write.
+    ///
     fn write_str_raw(&mut self, string: &str) {
         for byte in string.bytes() {
             if byte == b'\n' {
@@ -94,26 +123,52 @@ impl SerialDevice for ActiveSerial {
 
 pub struct SerialSink;
 
-impl LogSink for SerialSink {
-    fn write(&self, data: &[u8]) {
-        if let Some(uart) = GLOBAL_SERIAL.lock().as_mut() {
-            for &byte in data {
-                if byte == b'\n' {
+impl LogSink for SerialSink 
+{
+    ///
+    /// This routines writes a slice of data to the serial port,
+    /// it will automatically handles '\n' and '\n\r'
+    ///
+    /// # Arguments
+    ///
+    /// * data - A byte slice containing the content to write.
+    ///
+    fn write(&self, data: &[u8]) 
+    {
+        if let Some(uart) = GLOBAL_SERIAL.lock().as_mut() 
+        {
+            for &byte in data 
+            {
+                if byte == b'\n' 
+                {
                     uart.write_byte(b'\r');
                 }
+
                 uart.write_byte(byte);
             }
         }
     }
 }
 
-pub static GLOBAL_SERIAL: Mutex<Option<ActiveSerial>> = Mutex::new(None);
-pub static SERIAL_RX_BUFFER: Mutex<RingBuffer<512>>   = Mutex::new(RingBuffer::new());
+pub static GLOBAL_SERIAL:    Mutex<Option<ActiveSerial>> = Mutex::new(None);
+pub static SERIAL_RX_BUFFER: Mutex<RingBuffer<512>>      = Mutex::new(RingBuffer::new());
 
 pub static SERIAL_SINK: SerialSink = SerialSink;
 
-pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
-    let Some(compatible) = node.compatible() else {
+///
+/// This routines initializes a serial device,
+/// using the configuration found in the device tree node.
+///
+/// # Arguments
+///
+/// * node  - A reference to the Device Tree node that has the configuration
+/// * vaddr - The virtual memory address mapped for the node's mmio
+///
+pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> 
+{
+    let Some(compatible) = node.compatible()
+    else 
+    {
         return Err(Status::NOT_SUPPORTED);
     };
 
@@ -122,22 +177,28 @@ pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
     let base_vaddr = reg.starting_address as usize as u64 + vaddr;
     let mut device: Option<ActiveSerial> = None;
 
-    for comp in compatible.all() {
-        match comp {
-            "arm,pl011" => {
+    for comp in compatible.all() 
+    {
+        match comp 
+        {
+            "arm,pl011" => 
+            {
                 let mut uart = pl011uart::Pl011Uart::new(base_vaddr);
                 uart.init();
                 uart.enable_interrupts();
                 device = Some(ActiveSerial::Pl011(uart));
                 break;
             }
-            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => {
+
+            "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => 
+            {
                 let mut uart = meson_uart::MesonUart::new(base_vaddr);
                 uart.init();
                 uart.enable_interrupts();
                 device = Some(ActiveSerial::Meson(uart));
                 break;
             }
+
             _ => {}
         }
     }
@@ -156,8 +217,17 @@ pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()> {
     Ok(())
 }
 
-pub fn serial_interrupt_handler() {
-    if let Some(dev) = GLOBAL_SERIAL.lock().as_mut() {
+///
+/// This routine handles interrupts related to the serial driver,
+/// It will be registered as a interrupt handler,
+/// 
+/// technically the only one we got right now is RX,
+/// which is when input is given to the serial driver.
+///
+pub fn serial_interrupt_handler() 
+{
+    if let Some(dev) = GLOBAL_SERIAL.lock().as_mut() 
+    {
         while let Some(byte) = dev.read_byte()
         {
             let mut rxbuf = SERIAL_RX_BUFFER.lock();
@@ -166,6 +236,12 @@ pub fn serial_interrupt_handler() {
     }
 }
 
+///
+/// This routine reads a single character from the RX buffer.
+/// 
+/// This routine disables interrupts and locks the
+/// RX buffer to ensure concurrent access from threads is safe.
+///
 pub fn read_char() -> Option<u8>
 {
     //
