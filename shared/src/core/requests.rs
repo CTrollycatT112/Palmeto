@@ -19,11 +19,21 @@ pub static MEMMAP_REQUEST: MemmapRequest = MemmapRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
+pub static PAGING_REQUEST: PagingModeRequest = PagingModeRequest::PREFER_MAXIMUM;
+
+#[unsafe(link_section = ".boot")]
+pub static KERNEL_ADDR_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
+
+#[unsafe(link_section = ".boot")]
+pub static MODULE_REQUEST: ModulesRequest = ModulesRequest::new();
+
+#[used]
+#[unsafe(link_section = ".requests")]
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
-pub static EXEC_ADDR: ExecutableAddressRequest = ExecutableAddressRequest::new();
+pub static EXEC_ADDRESS_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
@@ -31,7 +41,7 @@ pub static DTB_REQUEST: DtbRequest = DtbRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
-pub static RSDP: RsdpRequest = RsdpRequest::new();
+pub static RSDP_REQUEST: RsdpRequest = RsdpRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]

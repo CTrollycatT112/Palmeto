@@ -7,6 +7,7 @@ edition = "2024"
 limine   = { workspace = true }
 flanterm = { workspace = true }
 bitflags = { workspace = true }
+bytemuck = { workspace = true }
 
 shared = { path = "../shared" }
 spin   = { workspace = true }

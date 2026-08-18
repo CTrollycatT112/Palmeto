@@ -10,7 +10,10 @@
 #![no_main]
 
 mod reloc;
+mod mmdat;
+
 mod dtbinit;
+mod timinit;
 
 //
 // !!! KERNEL IMPORTS
@@ -18,63 +21,20 @@ mod dtbinit;
 use kernel::fbcon;
 use kernel::arch;
 use kernel::arch::arm64::assembly::instructions;
-use kernel::arch::arm64::exception::timer;
 
+use shared::core::requests::DATE_AT_BOOT_REQUEST;
 //
 // !!! SHARED IMPORTS
 //
 use shared::{debug, fatal, println};
 use shared::core::requests::{HHDM_REQUEST, 
                              DTB_REQUEST, 
-                             CMDLINE_REQUEST, 
-                             DATE_AT_BOOT_REQUEST};
+                             CMDLINE_REQUEST};
 
 //
 // !!! RUST IMPORTS
 //
 use core::panic::PanicInfo;
-
-pub fn _init_boot_time()
-{
-    if let Some(response) = DATE_AT_BOOT_REQUEST.response()
-    {
-        let boot_time_seconds = response.timestamp;
-        
-        match timer::set_manual_unix_time_ms((boot_time_seconds as u64) * 1_000)
-        {
-            Ok(()) =>
-            {
-
-                let mut dt = timer::DateTime
-                {
-                    year: 0,
-                    month: 0,
-                    day: 0,
-                    hour: 0,
-                    minute: 0,
-                    second: 0,
-                };
-
-                if timer::now_datetime(&mut dt, true)
-                {
-                    let mut buf = [0u8; 64];
-
-                    timer::datetime_to_string(&dt, &mut buf, 20);
-                
-                    if let Ok(time_str) = core::str::from_utf8(&buf)
-                    {
-                        debug!("SYSTEM TIME: {}", time_str.trim_end_matches('\0'));
-                    }
-                }
-            }
-            Err(status) => {
-                debug!("FAILED TO SET BOOT TIME, STATUS: {:?}", status);
-            }
-        }
-    } else {
-        fatal!("LIMINE FAILED TO PROVIDE DATE");
-    }
-}
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
@@ -116,7 +76,12 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
-    _init_boot_time();
+    if let Some(_) = DATE_AT_BOOT_REQUEST.response()
+    {
+        timinit::init_time();
+    } else {
+        fatal!("DATE_AT_BOOT_REQUEST INVALID..");
+    }
 
     if let Some(cmd_response) = CMDLINE_REQUEST.response() {
         let raw_ptr: *const u8 = cmd_response.cmdline().as_ptr();
