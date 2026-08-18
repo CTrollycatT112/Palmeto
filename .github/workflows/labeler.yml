@@ -1,0 +1,55 @@
+name: Label pull requests
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  labeler:
+    name: Apply labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure project labels exist
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = {
+              kernel: '1d76db',
+              init: '1d76db',
+              drivers: '1d76db',
+              shared: '1d76db',
+              bindings: '5319e7',
+              build: 'fbca04',
+              documentation: '0075ca',
+              ci: '0e8a16',
+            };
+
+            for (const [name, color] of Object.entries(labels)) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color,
+                });
+              }
+            }
+
+      - name: Apply path labels
+        uses: actions/labeler@v6
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          sync-labels: true

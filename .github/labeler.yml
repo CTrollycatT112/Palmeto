@@ -1,0 +1,40 @@
+kernel:
+  - changed-files:
+      - any-glob-to-any-file: "kernel/**"
+
+init:
+  - changed-files:
+      - any-glob-to-any-file: "init/**"
+
+drivers:
+  - changed-files:
+      - any-glob-to-any-file: "drivers/**"
+
+shared:
+  - changed-files:
+      - any-glob-to-any-file: "shared/**"
+
+bindings:
+  - changed-files:
+      - any-glob-to-any-file: "bindings/**"
+
+build:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Cargo.toml"
+          - "Cargo.lock"
+          - "Makefile"
+          - "scripts/**"
+          - "toolchain/**"
+          - "rust-toolchain.toml"
+          - ".cargo/**"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "README.md"
+          - "**/*.md"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
