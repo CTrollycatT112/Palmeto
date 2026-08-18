@@ -18,6 +18,7 @@ mod mmdat;
 mod dtbinit;
 mod timinit;
 mod cmdinit;
+mod bootinfo;
 
 //
 // !!! KERNEL IMPORTS
@@ -42,6 +43,11 @@ pub extern "C" fn _start() -> ! {
     //
     fbcon::initialize();
     fbcon::reset_display();
+
+    //
+    // BOOT INFORMATION FILLING
+    //
+    bootinfo::fill_info();
 
     //
     // DEVICE TREE BLOB INITIALIZATION
