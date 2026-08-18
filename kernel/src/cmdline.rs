@@ -15,12 +15,27 @@ pub struct CmdLine<'a> {
     data: &'a str,
 }
 
-impl<'a> CmdLine<'a> {
-    pub const fn new(data: &'a str) -> Self {
+impl<'a> CmdLine<'a> 
+{
+    ///
+    /// This routine constructs a new CmdLine structure,
+    /// of course given the data you pass in.
+    ///
+    /// # Arguments
+    ///
+    /// * data - A string slice of command line arguments
+    ///
+    pub const fn new(data: &'a str) -> Self 
+    {
         Self { data }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = (&'a str, Option<&'a str>)> {
+    ///
+    /// This routine returns an iterator over the pairs parsed from the 
+    /// command line string.
+    ///
+    pub fn iter(&self) -> impl Iterator<Item = (&'a str, Option<&'a str>)> 
+    {
         let mut idx = 0;
 
         core::iter::from_fn(move || {
@@ -82,13 +97,41 @@ impl<'a> CmdLine<'a> {
         })
     }
 
-    pub fn get_string(&self, name: &str) -> Option<&'a str> {
+    ///
+    /// This routine gets the string value associated with a given arg name.
+    ///
+    /// # Arguments
+    ///
+    /// * name - The key name of hte command line arg to lookup.
+    ///
+    pub fn get_string(&self, name: &str) -> Option<&'a str> 
+    {
         self.iter()
             .find(|(key, _)| *key == name)
             .and_then(|(_, value)| value)
     }
 
-    pub fn get_bool(&self, name: &str) -> Option<bool> {
+    ///
+    /// This routine parses a boolean argument from the command line.
+    /// 
+    /// Flags present without a value evaluate to 'true'.
+    /// 
+    /// Recognized true string values include `"true"`,
+    ///                                       `"yes"`,
+    ///                                       `"on"`,
+    ///                                       `"1"`,
+    /// 
+    /// whilst false string values include
+    ///                                       `"false"`,
+    ///                                       `"no"`,
+    ///                                       `"off"`,
+    ///                                       `"0"`,
+    /// # Arguments
+    ///
+    /// * name - The name of the boolean argument.
+    ///
+    pub fn get_bool(&self, name: &str) -> Option<bool> 
+    {
         let entry = self.iter().find(|(key, _)| *key == name)?;
         match entry.1 {
             None => Some(true),
@@ -97,14 +140,32 @@ impl<'a> CmdLine<'a> {
             _ => None,
         }
     }
-
-    pub fn get_usize(&self, name: &str) -> Option<usize> {
+    
+    ///
+    /// This routine parses a usize argument value for the argument name.
+    ///
+    /// # Arguments
+    ///
+    /// * name - The name of hte usize argument to parse.
+    ///
+    pub fn get_usize(&self, name: &str) -> Option<usize> 
+    {
         let value = self.get_string(name)?;
         value.parse::<usize>().ok()
     }
 }
 
-pub fn parse_and_store(raw_cmdline: &str) {
+///
+/// This routine parses the kernel command line string,
+/// fills the boot configuration options,
+/// and initializes the BOOT_OPTIONS once-cell storage.
+///
+/// # Arguments
+///
+/// * raw_cmdline - A string slice containing the raw command line args passed.
+///
+pub fn parse_and_store(raw_cmdline: &str) 
+{
     let parser = CmdLine::new(raw_cmdline);
     let mut config = BootConfiguration::default();
 

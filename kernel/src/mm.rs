@@ -13,11 +13,17 @@ pub struct PhysAddr(usize);
 
 
 impl PhysAddr {
+    ///
+    /// This routine converts a physical address to a virtual pointer using HHDM.
+    ///
     pub fn as_hhdm<T>(self) -> *mut T {
         let hhdm_virt = *HHDM_START.get().expect("HHDM not initialized yet!"); 
         VirtAddr(self.0 + hhdm_virt.0).as_ptr()
     }
 
+    ///
+    /// This routine zeros out memory at a physical address via HHDM.
+    ///
     #[allow(dead_code)]
     pub(crate) fn zero_hhdm(self, len: usize) {
         unsafe { ptr::write_bytes(self.as_hhdm::<u8>(), 0, len) };
@@ -29,10 +35,16 @@ impl PhysAddr {
 pub struct VirtAddr(usize);
 
 impl VirtAddr {
+    ///
+    /// This routine converts a virtual address to a mutable pointer.
+    ///
     pub fn as_ptr<T>(self) -> *mut T {
         return ptr::with_exposed_provenance_mut(self.0);
     }
 
+    ///
+    /// This routine converts a virtual address to a physical address via HHDM offset.
+    ///
     pub fn as_hhdm(self) -> Option<PhysAddr> {
         let hhdm_virt = *HHDM_START.get()?; 
         self.0.checked_sub(hhdm_virt.0).map(PhysAddr)
@@ -42,20 +54,32 @@ impl VirtAddr {
 macro_rules! addr_impl {
     ($ty:ty) => {
         impl $ty {
+            ///
+            /// This routine returns a null address.
+            ///
             #[inline]
             pub const fn null() -> Self {
                 Self(0)
             }
 
+            ///
+            /// This routine creates a new address from a usize value.
+            ///
             pub const fn new(value: usize) -> Self {
                 Self(value)
             }
 
+            ///
+            /// This routine returns the raw usize value of the address.
+            ///
             #[inline]
             pub const fn value(&self) -> usize {
                 self.0
             }
 
+            ///
+            /// This routine checks if the address is null.
+            ///
             #[inline]
             pub const fn is_null(&self) -> bool {
                 self.0 == 0

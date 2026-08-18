@@ -8,13 +8,6 @@
 //
 
 //
-// TODO:
-//  Some general cleanup in this area? Some things should not be here...
-//  I don't even like the way im initializating it,
-//  maybe after heap allocator rework will happen?
-//
-
-//
 // MODULES THAT WE NEED..
 //
 pub mod alloc;
@@ -41,34 +34,58 @@ pub const HIDE_CURSOR: &str = "\x1b[?25l";
 pub const SHOW_CURSOR: &str = "\x1b[?25h";
 pub const CLEAR_SCREEN_HOME_CURSOR: &str = "\x1b[H\x1b[2J";
 
-//
-// Don't even ask...
-//
 pub struct TermWrapper(pub FlantermFb<'static>);
 unsafe impl Send for TermWrapper {}
 
 pub struct FbConsole;
 
-impl fmt::Write for FbConsole {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+impl fmt::Write for FbConsole 
+{
+    ///
+    /// This routine writes a string slice to the fbcon by
+    /// forwarding it to the string writing (internal functions)
+    ///
+    /// # Arguments
+    ///
+    /// * s - The string slice to write.
+    ///
+    fn write_str(&mut self, s: &str) -> fmt::Result 
+    {
         write_string(s);
         Ok(())
     }
 }
 
-impl shared::library::ulogger::sink::LogSink for FbConsole {
-    fn write(&self, data: &[u8]) {
+impl shared::library::ulogger::sink::LogSink for FbConsole 
+{
+    ///
+    /// This routine writes a slice of data to the fbcon
+    /// converting the UTF-8 byte stream into chars
+    ///
+    /// # Arguments
+    ///
+    /// * data - A byte slice containing the log.
+    ///
+    fn write(&self, data: &[u8]) 
+    {
         if let Ok(s) = core::str::from_utf8(data) {
             write_string(s);
         }
     }
 }
 
-pub static FBCON_SINK: FbConsole = FbConsole;
+pub static FBCON_SINK: FbConsole                  = FbConsole;
+static FBCON_TERM:     Mutex<Option<TermWrapper>> = Mutex::new(None);
 
-static FBCON_TERM: Mutex<Option<TermWrapper>> = Mutex::new(None);
-
-pub fn initialize() {
+///
+/// This routine initializes the fbcon using
+/// Limine's framebuffer request,
+/// applies the display font,
+/// registers as a global log sink,
+/// and hides the cursor.
+///
+pub fn initialize() 
+{
 
     if let Some(resp) = FRAMEBUFFER_REQUEST.response()
         && let Some(fb) = resp.framebuffers().first()
@@ -121,16 +138,36 @@ pub fn initialize() {
     }
 }
 
+///
+/// This routine resets the console display by
+/// clearing the screen and moving the cursor home.
+///
 pub fn reset_display() {
     write_string(CLEAR_SCREEN_HOME_CURSOR);
 }
 
+///
+/// This routine writes a single character to the fbcon
+///
+/// # Arguments
+///
+/// * character - The character to write.
+///
 pub fn write_char(character: char) {
     let mut buf = [0u8; 4];
     let encoded = character.encode_utf8(&mut buf);
     write_string(encoded);
 }
 
+///
+/// This routine writes a string slice to the fbcon,
+/// automatically converting new-line characters ('\n') into
+/// ('\n\r')
+///
+/// # Arguments
+///
+/// * s - The stirng to write
+///
 pub fn write_string(s: &str) {
     if let Some(wrapper) = FBCON_TERM.lock().as_mut() {
         let mut buf = [0u8; 4];
@@ -145,10 +182,10 @@ pub fn write_string(s: &str) {
     }
 }
 
-//
-// This is sort of..
-// Stupid?
-//
+///
+/// This routine sets the display up for a kernel panic.
+/// We will use the standard BSOD look ( i like it ).
+///
 pub fn set_kern_panic_color() {
     
     if let Some(resp) = FRAMEBUFFER_REQUEST.response()
