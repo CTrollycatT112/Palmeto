@@ -93,7 +93,7 @@ pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
         intrcntrl::enable_irq(irq);
     }
 
-    init(1);
+    init(1000);
     Ok(())
 }
 

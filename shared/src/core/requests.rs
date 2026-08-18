@@ -11,7 +11,7 @@ pub static REQUESTS_START: RequestsStartMarker = RequestsStartMarker::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
-pub static BASE_REVISION: BaseRevision = BaseRevision::new();
+pub static BASE_REVISION: BaseRevision = BaseRevision::with_revision(3);
 
 #[used]
 #[unsafe(link_section = ".requests")]
@@ -25,10 +25,10 @@ pub static MEMMAP_REQUEST: MemmapRequest = MemmapRequest::new();
 #[unsafe(link_section = ".requests")]
 pub static PAGING_REQUEST: PagingModeRequest = PagingModeRequest::PREFER_MAXIMUM;
 
-#[unsafe(link_section = ".boot")]
+#[unsafe(link_section = ".requests")]
 pub static KERNEL_ADDR_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
 
-#[unsafe(link_section = ".boot")]
+#[unsafe(link_section = ".requests")]
 pub static MODULE_REQUEST: ModulesRequest = ModulesRequest::new();
 
 #[used]
