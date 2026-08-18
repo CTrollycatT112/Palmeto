@@ -53,6 +53,12 @@ if command -v rustup >/dev/null 2>&1; then
         echo "  [MISSING] llvm-tools (nightly)"
         MISSING=1
     fi
+    if rustup component list --toolchain nightly 2>/dev/null | grep -q "clippy.*installed"; then
+        echo "  [ok] clippy (nightly)"
+    else
+        echo "  [MISSING] clippy (nightly)"
+        MISSING=1
+    fi
 else
     echo "  [MISSING] rustup"
     MISSING=1

@@ -56,6 +56,6 @@ if ! command -v rustup >/dev/null 2>&1; then
 fi
 
 rustup toolchain install nightly --profile minimal
-rustup component add rust-src llvm-tools-preview --toolchain nightly
+rustup component add rust-src llvm-tools-preview clippy --toolchain nightly
 
 echo "Dependencies installed. Run scripts/check-deps.sh to verify them."

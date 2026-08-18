@@ -22,7 +22,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
       - name: Install Rust components
-        run: rustup component add rust-src llvm-tools-preview
+        run: rustup component add rust-src llvm-tools-preview clippy
 
       - name: Check workspace
         run: cargo check --workspace -Zjson-target-spec
