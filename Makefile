@@ -22,7 +22,7 @@ OVMF_FW      := build/ovmf/QEMU_EFI.fd
 RUST_HOST    := $(shell rustc -vV | sed -n 's/host: //p')
 LLVM_OBJCOPY := $(shell rustc --print sysroot)/lib/rustlib/$(RUST_HOST)/bin/llvm-objcopy
 
-.PHONY: all deps check-deps install-deps scripts kernel limine image iso symbols run clean distclean ovmf
+.PHONY: all deps check-deps install-deps scripts kernel limine image iso symbols run debug clean distclean ovmf
 
 all: image iso
 
@@ -104,6 +104,23 @@ run: image ovmf
 		-display gtk \
 		-rtc base=utc \
 		-serial stdio
+
+debug: image ovmf
+	qemu-system-aarch64 \
+		-M virt,acpi=off,gic-version=2 \
+		-cpu cortex-a72 \
+		-m 512M \
+		-drive file=build/ovmf/code.fd,if=pflash,format=raw,readonly=on \
+		-drive file=build/ovmf/vars.fd,if=pflash,format=raw \
+		-fw_cfg name=opt/org.tianocore/BootTimeout,string=0 \
+		-drive file=$(IMAGE),format=raw,if=none,id=hd0 \
+		-device virtio-blk-pci,drive=hd0 \
+		-device ramfb \
+		-device virtio-gpu-pci \
+		-display gtk \
+		-rtc base=utc \
+		-serial stdio \
+		-S -gdb tcp::1234
 
 clean:
 	cargo clean

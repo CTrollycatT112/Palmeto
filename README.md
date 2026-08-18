@@ -56,3 +56,17 @@ make all
 make run
 make clean
 ```
+
+## Debugging with GDB
+
+In one terminal, start the paused kernel:
+
+```bash
+make debug
+```
+
+In another terminal, connect GDB:
+
+```bash
+gdb-multiarch -x .gdbinit
+```
