@@ -26,6 +26,11 @@ mod bootinfo;
 use kernel::fbcon;
 use kernel::arch;
 
+//
+// !!! SHARED IMPORTS
+//
+use shared::core::requests::BASE_REVISION;
+
 ///
 /// This routine is the very first function called by limine,
 /// it will handle very early setup and initializing systems.
@@ -36,7 +41,7 @@ pub extern "C" fn _start() -> ! {
     // RELOCATE INITIALIZATION
     //
     relocate::init();
-    
+
     //
     // ARCHITECTURE INITALIZATION
     //
@@ -67,6 +72,13 @@ pub extern "C" fn _start() -> ! {
     // COMMAND LINE INITIALIZATION
     //
     cmdinit::init();
+
+    //
+    // CHECK BASE REVISION SUPPORT
+    //
+    if !BASE_REVISION.is_supported() {
+        panic!("Limine does not support the requested base revision");
+    }
 
     loop {
         core::hint::spin_loop();

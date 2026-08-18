@@ -4,10 +4,14 @@
 //
 // Purpose: This file handles limine requests
 //
-use limine::{RequestsEndMarker, RequestsStartMarker, request::*};
+use limine::{BaseRevision, RequestsEndMarker, RequestsStartMarker, request::*};
 
 #[unsafe(link_section = ".requests_start_marker")]
 pub static REQUESTS_START: RequestsStartMarker = RequestsStartMarker::new();
+
+#[used]
+#[unsafe(link_section = ".requests")]
+pub static BASE_REVISION: BaseRevision = BaseRevision::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]

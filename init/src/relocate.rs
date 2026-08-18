@@ -21,6 +21,7 @@ const R_AARCH64_RELATIVE: u64 = 1027;
 unsafe extern "C" {
     static __rela_start: Elf64Rela;
     static __rela_end:   Elf64Rela;
+    static __start_text: u8;
 }
 
 ///
@@ -67,11 +68,11 @@ unsafe fn apply_runtime_relocations(actual_kernel_base: u64) {
 ///
 pub fn init()
 {
-    let pc: u64;
+    let actual_kernel_base: u64;
 
     unsafe
     {
-        core::arch::asm!("adrp {}, .", out(reg) pc);
-        apply_runtime_relocations(pc);
+        core::arch::asm!("adrp {}, __start_text", out(reg) actual_kernel_base);
+        apply_runtime_relocations(actual_kernel_base);
     }
 }

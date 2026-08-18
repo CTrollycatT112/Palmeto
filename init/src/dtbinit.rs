@@ -11,8 +11,9 @@
 
 use drivers::tty::serial;
 use kernel::arch::arm64::exception::{timer, intrcntrl};
+use kernel::arch::arm64::mmio::map_device_block;
 
-use shared::{core::{requests::{DTB_REQUEST, HHDM_REQUEST}, 
+use shared::{core::{requests::{DTB_REQUEST, HHDM_REQUEST, KERNEL_ADDR_REQUEST},
              status::{KResult, Status}}, fatal};
 
 ///
@@ -28,7 +29,9 @@ use shared::{core::{requests::{DTB_REQUEST, HHDM_REQUEST},
 /// * hhdm_offset - The higher half direct map offset
 ///
 fn internal_init_dtb(dtb: *const u8, 
-                hhdm_offset: u64
+                hhdm_offset: u64,
+                kernel_physical: u64,
+                kernel_virtual: u64,
 ) -> KResult<()>  
 {
     if dtb.is_null()
@@ -41,12 +44,33 @@ fn internal_init_dtb(dtb: *const u8,
         Err(_) => return Err(Status::FILE_CORRUPT_ERROR),
     };
 
+
+    for node in fdt.all_nodes() {
+        if let Some(mut registers) = node.reg() {
+            while let Some(register) = registers.next() {
+                unsafe {
+                    map_device_block(
+                        register.starting_address as usize,
+                        hhdm_offset,
+                        kernel_physical,
+                        kernel_virtual,
+                    );
+                }
+            }
+        }
+    }
+
     for node in fdt.all_nodes()
     {
         if let Some(compatible) = node.compatible() {
             if compatible.all().any(|c| intrcntrl::COMPATIBLE_STRINGS.contains(&c)) 
             {
-                intrcntrl::try_init_node(&node)?;
+                intrcntrl::try_init_node(
+                    &node,
+                    hhdm_offset,
+                    kernel_physical,
+                    kernel_virtual,
+                )?;
                 break;
             }
         }
@@ -87,7 +111,15 @@ pub fn init() -> KResult<()>
     };
 
     let dtb_ptr = dtb_resp.dtb_ptr as *const u8;
-    internal_init_dtb(dtb_ptr, hhdm_offset)?;
+    let kernel = KERNEL_ADDR_REQUEST
+        .response()
+        .ok_or(Status::FILE_CORRUPT_ERROR)?;
+    internal_init_dtb(
+        dtb_ptr,
+        hhdm_offset,
+        kernel.physical_base,
+        kernel.virtual_base,
+    )?;
 
     Ok(())
 }

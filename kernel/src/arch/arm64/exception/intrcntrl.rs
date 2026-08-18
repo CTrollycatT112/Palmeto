@@ -17,6 +17,8 @@ use core::ptr::{read_volatile, write_volatile, addr_of_mut, addr_of};
 use shared::core::status::{Status, KResult};
 use shared::{trace};
 
+use crate::arch::arm64::mmio::map_device_block;
+
 static mut GICD_BASE: usize = 0;
 static mut GICC_BASE: usize = 0;
 
@@ -30,7 +32,12 @@ pub const COMPATIBLE_STRINGS: &[&str] = &[
 ///
 /// This routine initializes the interrupt controller from a device tree node.
 ///
-pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> 
+pub fn try_init_node(
+    node: &fdt::node::FdtNode,
+    hhdm_offset: u64,
+    kernel_physical: u64,
+    kernel_virtual: u64,
+) -> KResult<()>
 {
     let mut reg_iter = node.reg().ok_or(Status::FILE_CORRUPT_ERROR)?;
     
@@ -46,7 +53,15 @@ pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()>
     let cpu_reg = reg_iter.next().ok_or(Status::FILE_CORRUPT_ERROR)?;
     let cpu_base = cpu_reg.starting_address as usize;
 
-    init(dist_base, cpu_base)
+    unsafe {
+        map_device_block(dist_base, hhdm_offset, kernel_physical, kernel_virtual);
+        map_device_block(cpu_base, hhdm_offset, kernel_physical, kernel_virtual);
+    }
+
+    init(
+        dist_base.wrapping_add(hhdm_offset as usize),
+        cpu_base.wrapping_add(hhdm_offset as usize),
+    )
 }
 
 ///
@@ -70,12 +85,15 @@ pub fn init(dist_base: usize, cpu_base: usize) -> KResult<()>
 
         let dist_ctrl = dist_base as *mut u32;
         write_volatile(dist_ctrl, 1);
+        trace!("GIC DISTRIBUTER ENABLED");
 
         let cpu_ctrl = cpu_base as *mut u32;
         write_volatile(cpu_ctrl, 1);
+        trace!("GIC CPU INTERFACE ENABLED");
 
         let cpu_pmr = (cpu_base + 0x4) as *mut u32;
         write_volatile(cpu_pmr, 0xFF);
+        trace!("GIC PRIORITY MASK ENABLED");
     }
 
     Ok(())
