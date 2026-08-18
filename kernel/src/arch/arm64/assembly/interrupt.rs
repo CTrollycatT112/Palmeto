@@ -12,6 +12,9 @@
 
 use super::instructions;
 
+///
+/// This routine enables interrupts.
+///
 pub unsafe fn enable_interrupts()
 {
     unsafe
@@ -20,6 +23,9 @@ pub unsafe fn enable_interrupts()
     }
 }
 
+///
+/// This routine disables interrupts.
+///
 pub unsafe fn disable_interrupts()
 {
     unsafe
@@ -28,6 +34,9 @@ pub unsafe fn disable_interrupts()
     }
 }
 
+///
+/// This routine returns the current interrupt state.
+///
 pub unsafe fn get_interrupt_state() -> bool
 {
     unsafe
@@ -36,6 +45,9 @@ pub unsafe fn get_interrupt_state() -> bool
     }
 }
 
+///
+/// This routine toggles interrupts and returns the previous state.
+///
 pub unsafe fn toggle_interrupts(state: bool) -> bool
 {
     unsafe
@@ -44,6 +56,9 @@ pub unsafe fn toggle_interrupts(state: bool) -> bool
     }
 }
 
+///
+/// This routine saves the current state and disables interrupts.
+///
 pub unsafe fn save_and_disable_interrupts() -> bool
 {
     unsafe
@@ -52,6 +67,9 @@ pub unsafe fn save_and_disable_interrupts() -> bool
     }
 }
 
+///
+/// This routine restores the previous interrupt state.
+///
 pub unsafe fn restore_interrupts(previous_state: bool)
 {
     unsafe {

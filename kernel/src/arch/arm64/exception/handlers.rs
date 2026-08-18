@@ -20,6 +20,9 @@ pub struct KernelExceptionHandlers;
 
 #[allow(unused)]
 impl ExceptionHandlers for KernelExceptionHandlers {
+    ///
+    /// This routine handles synchronous CPU exceptions.
+    ///
     extern "C" fn sync_current(register_state: RegisterStateRef) 
     {
 
@@ -34,6 +37,9 @@ impl ExceptionHandlers for KernelExceptionHandlers {
         fatal!("UNRECOVERABLE CPU EXCEPTION: ESR={:x}, FAR={:x}", esr, far);
     }
 
+    ///
+    /// This routine handles interrupt requests.
+    ///
     extern "C" fn irq_current(register_state: RegisterStateRef)
     {
         let iar = intrcntrl::read_and_ack_interrupt();
@@ -53,6 +59,9 @@ impl ExceptionHandlers for KernelExceptionHandlers {
 
 exception_handlers!(KernelExceptionHandlers);
 
+///
+/// This routine initializes the exception handlers.
+///
 pub fn init() {
     unsafe {
         core::arch::asm!(

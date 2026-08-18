@@ -27,6 +27,9 @@ pub const COMPATIBLE_STRINGS: &[&str] = &[
     "arm,gic",
 ];
 
+///
+/// This routine initializes the interrupt controller from a device tree node.
+///
 pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> 
 {
     let mut reg_iter = node.reg().ok_or(Status::FILE_CORRUPT_ERROR)?;
@@ -46,6 +49,9 @@ pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()>
     init(dist_base, cpu_base)
 }
 
+///
+/// This routine initializes the GICv2 interrupt controller.
+///
 pub fn init(dist_base: usize, cpu_base: usize) -> KResult<()> 
 {
 
@@ -75,6 +81,9 @@ pub fn init(dist_base: usize, cpu_base: usize) -> KResult<()>
     Ok(())
 }
 
+///
+/// This routine enables an interrupt by ID.
+///
 pub fn enable_irq(irq_id: usize)
 {
     unsafe 
@@ -91,6 +100,9 @@ pub fn enable_irq(irq_id: usize)
     }
 }
 
+///
+/// This routine reads and acknowledges an interrupt.
+///
 pub fn read_and_ack_interrupt() -> u32 {
     unsafe {
         let base = *addr_of!(GICC_BASE);
@@ -99,6 +111,9 @@ pub fn read_and_ack_interrupt() -> u32 {
     }
 }
 
+///
+/// This routine parses an interrupt from a device tree node.
+///
 pub fn parse_interrupt(node: &fdt::node::FdtNode, index: usize) -> KResult<usize> 
 {
     let prop  = node.property("interrupts").ok_or(Status::FILE_CORRUPT_ERROR)?;
@@ -114,6 +129,9 @@ pub fn parse_interrupt(node: &fdt::node::FdtNode, index: usize) -> KResult<usize
     }
 }
 
+///
+/// This routine signals the end of interrupt processing.
+///
 pub fn end_of_interrupt(interrupt_id: u32) {
     unsafe {
         let base = *addr_of!(GICC_BASE);

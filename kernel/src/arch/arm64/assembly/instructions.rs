@@ -18,6 +18,9 @@ pub struct ArmCpuIdResult {
     pub id_aa64pfr0: u64,
 }
 
+///
+/// This routine reads CPU feature registers.
+///
 #[inline]
 pub unsafe fn read_cpu_features() -> ArmCpuIdResult {
     let midr: u64;
@@ -36,6 +39,9 @@ pub unsafe fn read_cpu_features() -> ArmCpuIdResult {
     ArmCpuIdResult { midr, mpidr, id_aa64pfr0 }
 }
 
+///
+/// This routine reads the system control register EL1.
+///
 #[inline]
 pub unsafe fn read_sctlr_el1() -> u64 {
     let value: u64;
@@ -45,6 +51,9 @@ pub unsafe fn read_sctlr_el1() -> u64 {
     value
 }
 
+///
+/// This routine writes to the system control register EL1.
+///
 #[inline]
 pub unsafe fn write_sctlr_el1(value: u64) {
     unsafe {
@@ -52,6 +61,9 @@ pub unsafe fn write_sctlr_el1(value: u64) {
     }
 }
 
+///
+/// This routine reads the current timestamp counter.
+///
 #[inline]
 pub fn rdtsc() -> u64 {
     let value: u64;
@@ -61,6 +73,9 @@ pub fn rdtsc() -> u64 {
     value
 }
 
+///
+/// This routine saves the floating point context.
+///
 #[inline]
 pub unsafe fn save_fp_context(memory: *mut u128) {
     unsafe {
@@ -72,6 +87,9 @@ pub unsafe fn save_fp_context(memory: *mut u128) {
     }
 }
 
+///
+/// This routine reads an 8-bit value from memory-mapped I/O.
+///
 #[inline]
 pub unsafe fn mmio_read8(address: usize) -> u8 {
     unsafe {
@@ -79,6 +97,9 @@ pub unsafe fn mmio_read8(address: usize) -> u8 {
     }
 }
 
+///
+/// This routine writes an 8-bit value to memory-mapped I/O.
+///
 #[inline]
 pub unsafe fn mmio_write8(address: usize, value: u8) {
     unsafe {
@@ -86,6 +107,9 @@ pub unsafe fn mmio_write8(address: usize, value: u8) {
     }
 }
 
+///
+/// This routine reads the TLS pointer register.
+///
 #[inline]
 pub unsafe fn read_tls_pointer() -> u64 {
     let value: u64;
@@ -95,6 +119,9 @@ pub unsafe fn read_tls_pointer() -> u64 {
     value
 }
 
+///
+/// This routine reads the exception syndrome register EL1.
+///
 #[inline]
 pub unsafe fn read_esr_el1() -> u64 {
     let val: u64;
@@ -102,6 +129,9 @@ pub unsafe fn read_esr_el1() -> u64 {
     val
 }
 
+///
+/// This routine reads the exception link register EL1.
+///
 #[inline]
 pub unsafe fn read_elr_el1() -> u64 {
     let val: u64;
@@ -109,6 +139,9 @@ pub unsafe fn read_elr_el1() -> u64 {
     val
 }
 
+///
+/// This routine reads the fault address register EL1.
+///
 #[inline]
 pub unsafe fn read_far_el1() -> u64 {
     let val: u64;
@@ -116,6 +149,9 @@ pub unsafe fn read_far_el1() -> u64 {
     val
 }
 
+///
+/// This routine writes to the TLS pointer register.
+///
 #[inline]
 pub unsafe fn write_tls_pointer(value: u64) {
     unsafe {
@@ -123,6 +159,9 @@ pub unsafe fn write_tls_pointer(value: u64) {
     }
 }
 
+///
+/// This routine disables interrupts.
+///
 #[inline]
 pub unsafe fn cli() {
     unsafe {
@@ -130,6 +169,9 @@ pub unsafe fn cli() {
     }
 }
 
+///
+/// This routine enables interrupts.
+///
 #[inline]
 pub unsafe fn sti() {
     unsafe {
@@ -137,6 +179,9 @@ pub unsafe fn sti() {
     }
 }
 
+///
+/// This routine halts the CPU.
+///
 #[inline]
 pub unsafe fn halt() {
     unsafe {
@@ -144,6 +189,9 @@ pub unsafe fn halt() {
     }
 }
 
+///
+/// This routine halts the CPU forever in a loop.
+///
 pub fn halt_forever() {
     loop {
         unsafe {
@@ -153,6 +201,9 @@ pub fn halt_forever() {
     }
 }
 
+///
+/// This routine returns the current interrupt state.
+///
 #[inline]
 pub unsafe fn interrupt_state() -> bool {
     let value: u64;
@@ -162,6 +213,9 @@ pub unsafe fn interrupt_state() -> bool {
     (value & (1 << 7)) == 0
 }
 
+///
+/// This routine toggles interrupts and returns the previous state.
+///
 #[inline]
 pub unsafe fn toggle_interrupts(state: bool) -> bool {
     let current_state = unsafe { interrupt_state() };

@@ -13,6 +13,9 @@ use shared::core::requests::FRAMEBUFFER_REQUEST;
 
 pub static DRAW_LOCK: Mutex<()> = Mutex::new(());
 
+///
+/// This routine plots a single pixel on the framebuffer.
+///
 #[inline]
 pub unsafe fn plot_pixel(
     fb_ptr: *mut u8,
@@ -47,6 +50,9 @@ pub unsafe fn plot_pixel(
     }
 }
 
+///
+/// This routine fills a rectangular region of the display with a color.
+///
 pub fn fill_display(left: u32, top: u32, right: u32, bottom: u32, color: u32) {
     let response = match FRAMEBUFFER_REQUEST.response() {
         Some(resp) => resp,
@@ -75,6 +81,9 @@ pub fn fill_display(left: u32, top: u32, right: u32, bottom: u32, color: u32) {
     }
 }
 
+///
+/// This routine queries the framebuffer information from the firmware.
+///
 pub fn query_framebuffer_information() -> Option<(u32, u32, u64, u32)> {
     let response = FRAMEBUFFER_REQUEST.response()?;
     if response.framebuffers().is_empty() {

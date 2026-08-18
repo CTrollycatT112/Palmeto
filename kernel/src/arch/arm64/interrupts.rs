@@ -21,6 +21,9 @@ static IRQ_TABLE: Mutex<[Option<IrqHandler>; MAX_IRQS]> = Mutex::new(
     [None; MAX_IRQS]
 );
 
+///
+/// This routine registers an interrupt handler.
+///
 pub fn register_handler(irq: usize, handler: IrqHandler)
 {
     if irq >= MAX_IRQS {
@@ -42,6 +45,9 @@ pub fn register_handler(irq: usize, handler: IrqHandler)
     };
 }
 
+///
+/// This routine dispatches an interrupt to its registered handler.
+///
 pub fn dispatch(irq: usize)
 {
     if irq >= MAX_IRQS

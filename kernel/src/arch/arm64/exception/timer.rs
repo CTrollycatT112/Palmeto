@@ -61,6 +61,9 @@ pub const COMPATIBLE_STRINGS: &[&str] = &[
 
 pub static TIME_STATE: Mutex<TimeState> = Mutex::new(TimeState::new());
 
+///
+/// This routine handles timer interrupts.
+///
 pub fn timer_interrupt_handler()
 {
     //
@@ -69,6 +72,9 @@ pub fn timer_interrupt_handler()
     reset(1000);
 }
 
+///
+/// This routine initializes the timer from a device tree node.
+///
 pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
     debug!("FOUND TIMER...");
 
@@ -83,6 +89,9 @@ pub fn try_init_node(node: &fdt::node::FdtNode) -> KResult<()> {
     Ok(())
 }
 
+///
+/// This routine reads the timer frequency from the hardware.
+///
 pub fn rd_cntfrq_el0() -> u64 {
     let v: u64;
     unsafe {
@@ -91,6 +100,9 @@ pub fn rd_cntfrq_el0() -> u64 {
     v
 }
 
+///
+/// This routine resets the timer with the given millisecond interval.
+///
 pub fn reset(time: u64) {
     let freq: u64 = rd_cntfrq_el0();
     let interval: u64 = (freq * time) / MS_PER_SEC;
@@ -104,6 +116,9 @@ pub fn reset(time: u64) {
     }
 }
 
+///
+/// This routine enables the physical timer.
+///
 pub fn enable() {
     let val: u64 = 1;
     unsafe {
@@ -120,6 +135,9 @@ pub fn enable() {
     }
 }
 
+///
+/// This routine disables the physical timer.
+///
 pub fn disable() {
     let ctl: u64 = 0;
     unsafe {
@@ -135,6 +153,9 @@ pub fn disable() {
     }
 }
 
+///
+/// This routine permanently disables the timer.
+///
 pub fn permanent_disable_timer() {
     let ctl: u64 = 0;
     unsafe {
@@ -155,6 +176,9 @@ pub fn permanent_disable_timer() {
     }
 }
 
+///
+/// This routine returns the current timer count.
+///
 pub fn now() -> u64 {
     let val: u64;
     unsafe {
@@ -167,6 +191,9 @@ pub fn now() -> u64 {
     val
 }
 
+///
+/// This routine returns the current time in milliseconds.
+///
 pub fn now_msec() -> u64 {
     let ticks = now();
     let freq = rd_cntfrq_el0();
@@ -176,6 +203,9 @@ pub fn now_msec() -> u64 {
     (ticks * MS_PER_SEC) / freq
 }
 
+///
+/// This routine returns the current time in microseconds.
+///
 pub fn now_usec() -> u64 {
     let ticks = now();
     let freq = rd_cntfrq_el0();
@@ -187,6 +217,9 @@ pub fn now_usec() -> u64 {
     q * US_PER_SEC + (r * US_PER_SEC) / freq
 }
 
+///
+/// This routine initializes the timer subsystem.
+///
 pub fn init(msecs: u64) {
     reset(msecs);
     enable();
@@ -199,6 +232,9 @@ pub fn init(msecs: u64) {
     state.sync = false;
 }
 
+///
+/// This routine resets the virtual timer.
+///
 pub fn virtual_reset(smsecs: u64) {
     let freq = rd_cntfrq_el0();
     let interval = (freq * smsecs) / MS_PER_SEC;
@@ -212,6 +248,9 @@ pub fn virtual_reset(smsecs: u64) {
     }
 }
 
+///
+/// This routine enables the virtual timer.
+///
 pub fn virtual_enable() {
     let val: u64 = 1;
     unsafe {
@@ -223,6 +262,9 @@ pub fn virtual_enable() {
     }
 }
 
+///
+/// This routine disables the virtual timer.
+///
 pub fn virtual_disable() {
     let val: u64 = 0;
     unsafe {
@@ -234,6 +276,9 @@ pub fn virtual_disable() {
     }
 }
 
+///
+/// This routine returns the remaining time on the virtual timer in milliseconds.
+///
 pub fn virtual_remaining_msec() -> u64 {
     let ticks: u64;
     let freq = rd_cntfrq_el0();
@@ -252,6 +297,9 @@ pub fn virtual_remaining_msec() -> u64 {
     (ticks * MS_PER_SEC) / freq
 }
 
+///
+/// This routine advances the wall time to the current monotonic time.
+///
 fn wall_advance_to(mono_now_us: u64) -> i64 {
     let mut state = TIME_STATE.lock();
 
@@ -285,10 +333,16 @@ fn wall_advance_to(mono_now_us: u64) -> i64 {
     base
 }
 
+///
+/// This routine returns the current wall time in microseconds.
+///
 pub fn wall_time_us() -> u64 {
     wall_advance_to(now_usec()) as u64
 }
 
+///
+/// This routine returns the current UNIX time in microseconds.
+///
 pub fn unix_time_us() -> u64 {
     let synced = TIME_STATE.lock().sync;
     if !synced {
@@ -303,6 +357,9 @@ pub fn unix_time_us() -> u64 {
     u as u64
 }
 
+///
+/// This routine synchronizes the UNIX time in microseconds.
+///
 pub fn sync_set_unix_us(unix_us: u64) {
     let now_us = now_usec();
     let mut state = TIME_STATE.lock();
@@ -313,29 +370,47 @@ pub fn sync_set_unix_us(unix_us: u64) {
     state.sync = true;
 }
 
+///
+/// This routine applies a time slew adjustment in microseconds.
+///
 pub fn sync_slew_us(delta_us: i64) {
     let mut state = TIME_STATE.lock();
     let v = state.slew_rem_us + delta_us;
     state.slew_rem_us = v.clamp(-US_PER_MAX_SLEW_CAP, US_PER_MAX_SLEW_CAP);
 }
 
+///
+/// This routine sets the frequency adjustment in PPM.
+///
 pub fn sync_set_freq_ppm(ppm: i32) {
     let mut state = TIME_STATE.lock();
     state.freq_ppm = ppm.clamp(-TIMER_FREQ_MAX_PPM, TIMER_FREQ_MAX_PPM);
 }
 
+///
+/// This routine gets the frequency adjustment in PPM.
+///
 pub fn sync_get_freq_ppm() -> i32 {
     TIME_STATE.lock().freq_ppm
 }
 
+///
+/// This routine applies an SNTP time sample.
+///
 pub fn apply_sntp_sample_us(server_unix_us: u64) {
     sync_set_unix_us(server_unix_us);
 }
 
+///
+/// This routine checks if the system time is synchronized.
+///
 pub fn is_synchronised() -> bool {
     TIME_STATE.lock().sync
 }
 
+///
+/// This routine returns the current UNIX time in milliseconds.
+///
 pub fn unix_time_ms() -> u64 {
     let us = unix_time_us();
     if us == 0 {
@@ -344,15 +419,24 @@ pub fn unix_time_ms() -> u64 {
     us / MS_PER_SEC
 }
 
+///
+/// This routine sets the timezone offset in minutes.
+///
 pub fn set_timezone_minutes(minutes: i32) {
     let mut state = TIME_STATE.lock();
     state.tz_offset_min = minutes;
 }
 
+///
+/// This routine gets the timezone offset in minutes.
+///
 pub fn get_timezone_minutes() -> i32 {
     TIME_STATE.lock().tz_offset_min
 }
 
+///
+/// This routine returns the current local time in milliseconds.
+///
 pub fn local_time_ms() -> u64 {
     let utc_ms = unix_time_ms();
     if utc_ms == 0 {
@@ -368,6 +452,9 @@ pub fn local_time_ms() -> u64 {
     adj as u64
 }
 
+///
+/// This routine sets the UNIX time manually in milliseconds.
+///
 pub fn set_manual_unix_time_ms(unix_ms: u64) -> KResult<()> {
     let mut state = TIME_STATE.lock();
     if state.sync {
@@ -380,6 +467,9 @@ pub fn set_manual_unix_time_ms(unix_ms: u64) -> KResult<()> {
     Ok(())
 }
 
+///
+/// This routine calculates the number of days from a civil date.
+///
 fn days_from_civil(mut y: i64, m: u32, d: u32) -> i64 {
     y -= if m <= 2 { 1 } else { 0 };
     let era = (if y >= 0 { y } else { y - 399 }) / 400;
@@ -390,6 +480,9 @@ fn days_from_civil(mut y: i64, m: u32, d: u32) -> i64 {
     era * 146097 + (doe as i64) - 719468
 }
 
+///
+/// This routine converts days to a civil date.
+///
 fn civil_from_days(z: i64) -> (i64, u32, u32) {
     let z = z + 719468;
     let era = (if z >= 0 { z } else { z - 146096 }) / 146097;
@@ -404,6 +497,9 @@ fn civil_from_days(z: i64) -> (i64, u32, u32) {
     (y_full, mm, dd)
 }
 
+///
+/// This routine converts UNIX milliseconds to a DateTime structure.
+///
 pub fn unix_ms_to_datetime(unix_ms: u64, use_local: bool, out: &mut DateTime) {
     let tz_offset = TIME_STATE.lock().tz_offset_min as i64;
     let mut ms = unix_ms as i64;
@@ -429,6 +525,9 @@ pub fn unix_ms_to_datetime(unix_ms: u64, use_local: bool, out: &mut DateTime) {
     out.second = (sod % 60) as u8;
 }
 
+///
+/// This routine converts a DateTime structure to UNIX milliseconds.
+///
 pub fn datetime_to_unix_ms(dt: &DateTime, is_local: bool) -> u64 {
     let mut y = dt.year as i64;
     if y < 1970 {
@@ -457,6 +556,9 @@ pub fn datetime_to_unix_ms(dt: &DateTime, is_local: bool) -> u64 {
     ms as u64
 }
 
+///
+/// This routine gets the current time as a DateTime structure.
+///
 pub fn now_datetime(out: &mut DateTime, use_local: bool) -> bool {
     let ms = if use_local { local_time_ms() } else { unix_time_ms() };
     if ms == 0 {
@@ -466,6 +568,9 @@ pub fn now_datetime(out: &mut DateTime, use_local: bool) -> bool {
     true
 }
 
+///
+/// This routine converts a DateTime to a string.
+///
 pub fn datetime_to_string(dt: &DateTime, buf: &mut [u8], buflen: u32) {
     if buflen < 20 || buf.len() < 20 {
         return;

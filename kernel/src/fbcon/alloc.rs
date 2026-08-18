@@ -26,6 +26,9 @@ static STATIC_HEAP_POS: AtomicUsize = AtomicUsize::new(0);
 pub struct StaticBumpAllocator;
 
 unsafe impl GlobalAlloc for StaticBumpAllocator {
+    ///
+    /// This routine allocates memory from the static heap.
+    ///
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let align = layout.align();
         let size = layout.size();
@@ -55,6 +58,9 @@ unsafe impl GlobalAlloc for StaticBumpAllocator {
         }
     }
 
+    ///
+    /// This routine deallocates memory (no-op for bump allocator).
+    ///
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
     }
 }
