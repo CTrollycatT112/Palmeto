@@ -10,6 +10,7 @@ use spin::Once;
 
 pub static BOOT_OPTIONS: Once<BootConfiguration> = Once::new();
 
+#[derive(Default, Debug, Clone, Copy)]
 pub struct CmdLine<'a> {
     data: &'a str,
 }

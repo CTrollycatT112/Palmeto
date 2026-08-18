@@ -33,10 +33,6 @@ pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
 #[used]
 #[unsafe(link_section = ".requests")]
-pub static EXEC_ADDRESS_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
-
-#[used]
-#[unsafe(link_section = ".requests")]
 pub static DTB_REQUEST: DtbRequest = DtbRequest::new();
 
 #[used]

@@ -74,8 +74,9 @@ dependencies = [
  "drivers",
  "fdt",
  "kernel",
- "limine 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "limine",
  "shared",
+ "spin",
 ]
 
 [[package]]
@@ -86,7 +87,7 @@ dependencies = [
  "bytemuck",
  "fdt",
  "flanterm",
- "limine 0.6.5",
+ "limine",
  "shared",
  "spin",
 ]
@@ -97,12 +98,6 @@ version = "0.6.5"
 dependencies = [
  "uuid",
 ]
-
-[[package]]
-name = "limine"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29363c0f37e66e18575fadf7141c56ee7ea04ae5fecbeb25eff303f77af203a9"
 
 [[package]]
 name = "proc-macro2"
@@ -126,7 +121,7 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
- "limine 0.6.5",
+ "limine",
  "spin",
 ]
 
