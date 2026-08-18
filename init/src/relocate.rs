@@ -23,6 +23,14 @@ unsafe extern "C" {
     static __rela_end:   Elf64Rela;
 }
 
+///
+/// This routine handles relocating the kernel image,
+/// and adjusts addresses to match runtime load addresses.
+///
+/// # Arguments
+///
+/// * actual_kernel_base - virtual memory address where the kernel was loaded (by Limine)
+///
 unsafe fn apply_runtime_relocations(actual_kernel_base: u64) {
     const LINK_BASE: u64 = 0xffffffff80000000;
     let slide_offset     = actual_kernel_base.wrapping_sub(LINK_BASE);
@@ -53,6 +61,10 @@ unsafe fn apply_runtime_relocations(actual_kernel_base: u64) {
     }
 }
 
+///
+/// This routine calls the internal initialization functions,
+/// so that the main function can remain clean
+///
 pub fn init()
 {
     let pc: u64;

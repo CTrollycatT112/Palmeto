@@ -62,6 +62,11 @@ pub struct BootInfo {
 static BOOT_INFO: Once<BootInfo> = Once::new();
 
 impl BootInfo {
+    ///
+    /// This routine constructs a new BootInfo struct,
+    /// the structure will be completely empty,
+    /// so you do not need to worry about passing args.
+    ///
     pub const fn new() -> Self {
         Self {
             command_line: CmdLine::new(""),
@@ -77,10 +82,19 @@ impl BootInfo {
         }
     }
 
+    ///
+    /// This routine will register BOOT_INFO
+    ///
     pub fn register(self) {
         BOOT_INFO.call_once(|| self);
     }
 
+    ///
+    /// This routine will attempt to get the BOOT_INFO,
+    /// If it fails it will throw an error,
+    /// If the operation is successful,
+    /// It will give you the BOOT_INFO structure
+    ///
     pub fn get() -> &'static Self {
         BOOT_INFO.get().expect("boot info not initialized")
     }
@@ -94,6 +108,11 @@ pub struct BootFile {
 }
 
 impl BootFile {
+    ///
+    /// This routine constructs a new BootFile structure,
+    /// The structure will contain empty values,
+    /// you must fill it later
+    ///
     pub const fn new() -> Self {
         Self {
             data: PhysAddr::null(),
@@ -104,12 +123,20 @@ impl BootFile {
 }
 
 static mut MEMMAP_BUF: [PhysMemory; 128] = [PhysMemory::empty(); _];
-static mut FILE_BUF: [BootFile; 32] = [BootFile::new(); _];
+static mut FILE_BUF:   [BootFile; 32]    = [BootFile::new(); _];
 
-const STRING_BUF_LEN: usize = 2048;
-static mut CMDLINE_BUF: [u8; STRING_BUF_LEN] = [0; _];
-static mut FILE_NAME_BUF: [u8; STRING_BUF_LEN] = [0; _];
+const      STRING_BUF_LEN: usize = 2048;
+static mut CMDLINE_BUF:    [u8; STRING_BUF_LEN] = [0; _];
+static mut FILE_NAME_BUF:  [u8; STRING_BUF_LEN] = [0; _];
 
+///
+/// This routine constructs a new BootInfo structure,
+/// fills it's parameters,
+/// then registers it as the global (BOOT_INFO) structure.
+/// 
+/// This routine must be called,
+/// otherwise BOOT_INFO will not exist
+///
 pub fn fill_info()
 {
     let mut info = BootInfo::new();

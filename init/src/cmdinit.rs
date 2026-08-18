@@ -6,6 +6,12 @@
 //
 use shared::{core::requests::CMDLINE_REQUEST, debug};
 
+/// This routine initializes the command line parser. 
+/// Users are allowed to pass commands to Limine, such as `video=1080x720`.
+/// 
+/// We must manually parse the command line, if a recognized 
+/// command is found, we can try and do something with it
+/// 
 pub fn init()
 {
     if let Some(cmd_response) = CMDLINE_REQUEST.response() 

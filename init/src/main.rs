@@ -26,6 +26,10 @@ mod bootinfo;
 use kernel::fbcon;
 use kernel::arch;
 
+///
+/// This routine is the very first function called by limine,
+/// it will handle very early setup and initializing systems.
+///
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     //

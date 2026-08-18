@@ -15,6 +15,18 @@ use kernel::arch::arm64::exception::{timer, intrcntrl};
 use shared::{core::{requests::{DTB_REQUEST, HHDM_REQUEST}, 
              status::{KResult, Status}}, fatal};
 
+///
+/// This routine uses libfdt to parse the device tree blob,
+/// this is how AARCH64 boards let you access devices.
+/// 
+/// Instead of hard-coding MMIO addresses for every device,
+/// we can dynamically find them.
+///
+/// # Arguments
+///
+/// * dtb         - Start of byte stream for the DTB
+/// * hhdm_offset - The higher half direct map offset
+///
 fn internal_init_dtb(dtb: *const u8, 
                 hhdm_offset: u64
 ) -> KResult<()>  
@@ -55,6 +67,10 @@ fn internal_init_dtb(dtb: *const u8,
     Ok(())
 }
 
+///
+/// This routine handles calling the internal init routines,
+/// so that main can remain clean and not access limine requests.
+///
 pub fn init() -> KResult<()>
 {
     let hhdm_offset = HHDM_REQUEST

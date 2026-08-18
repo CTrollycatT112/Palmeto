@@ -10,6 +10,19 @@ use kernel::{arch::arm64::assembly::instructions, fbcon};
 
 use shared::println;
 
+///
+/// This routine handles kernel panics,
+/// if some bad rust code is called,
+/// or the kernel runs into an exception,
+/// this routine is called.
+/// 
+/// It will print information about the panic,
+/// and infinitely halt.
+///
+/// # Arguments
+///
+/// * info - Information provided by Rust core::
+///
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
     fbcon::set_kern_panic_color();

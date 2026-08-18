@@ -35,6 +35,10 @@ pub struct PhysMemory {
 //
 #[allow(dead_code)]
 impl PhysMemory {
+    ///
+    /// This routine constructs an empty PhysMemory structure,
+    /// you can fill the structure later
+    ///
     pub const fn empty() -> Self {
         Self {
             address: PhysAddr::null(),

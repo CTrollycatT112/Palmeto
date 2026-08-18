@@ -12,6 +12,11 @@ use shared::{core::requests::DATE_AT_BOOT_REQUEST, debug, fatal};
 
 use kernel::arch::arm64::exception::timer;
 
+///
+/// This routine handles setting up DateTime related stuff,
+/// we will get boot time from limine,
+/// then set our current timer to the boot time.
+///
 pub fn init_time()
 {
     if let Some(response) = DATE_AT_BOOT_REQUEST.response()
