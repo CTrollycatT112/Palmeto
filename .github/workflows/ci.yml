@@ -25,7 +25,7 @@ jobs:
         run: rustup component add rust-src llvm-tools-preview
 
       - name: Check workspace
-        run: cargo check --workspace
+        run: cargo check --workspace -Zjson-target-spec
 
       - name: Build kernel
         run: cargo build --profile dev -Zjson-target-spec
