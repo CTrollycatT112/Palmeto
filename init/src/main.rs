@@ -13,7 +13,7 @@
 // !!! MODULES
 //
 mod panic;
-mod reloc;
+mod relocate;
 mod mmdat;
 mod dtbinit;
 mod timinit;
@@ -28,14 +28,10 @@ use kernel::arch;
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     //
-    // RELOCATION HANDLING
+    // RELOCATE INITIALIZATION
     //
-    let runtime_pc: u64;
-    unsafe {
-        core::arch::asm!("adrp {}, .", out(reg) runtime_pc);
-        reloc::apply_runtime_relocations(runtime_pc);
-    }
-
+    relocate::init();
+    
     //
     // ARCHITECTURE INITALIZATION
     //
