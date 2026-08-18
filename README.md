@@ -46,7 +46,7 @@ However, there is some cases where AI will be used:
 Before running, make sure you have the tools by running:
 
 ```bash
-toolchain/check-deps.sh
+make deps
 ```
 
 Then you can use:

@@ -4,6 +4,10 @@ override BUILD_PROFILE := dev
 override PROFILE_DIR   := $(if $(filter dev,$(BUILD_PROFILE)),debug,$(BUILD_PROFILE))
 override BUILD_TYPE    := $(if $(filter dev,$(BUILD_PROFILE)),chk,fre)
 
+SCRIPT_DIR   := scripts
+CHECK_DEPS   := $(SCRIPT_DIR)/check-deps.sh
+INSTALL_DEPS := $(SCRIPT_DIR)/install-deps.sh
+
 KERNEL_DIR   := kernel
 KERNEL_BIN   := target/aarch64-kernel/$(PROFILE_DIR)/$(IMAGE_NAME)
 LIMINE_DIR   := build/limine
@@ -18,9 +22,20 @@ OVMF_FW      := build/ovmf/QEMU_EFI.fd
 RUST_HOST    := $(shell rustc -vV | sed -n 's/host: //p')
 LLVM_OBJCOPY := $(shell rustc --print sysroot)/lib/rustlib/$(RUST_HOST)/bin/llvm-objcopy
 
-.PHONY: all kernel limine image iso symbols run clean distclean ovmf
+.PHONY: all deps check-deps install-deps scripts kernel limine image iso symbols run clean distclean ovmf
 
 all: image iso
+
+scripts:
+	chmod +x $(CHECK_DEPS) $(INSTALL_DEPS)
+
+deps: check-deps
+
+check-deps: scripts
+	./$(CHECK_DEPS)
+
+install-deps: scripts
+	./$(INSTALL_DEPS)
 
 kernel:
 	cargo build --profile $(BUILD_PROFILE) -Zjson-target-spec
