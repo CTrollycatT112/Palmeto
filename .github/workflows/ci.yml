@@ -19,7 +19,7 @@ jobs:
           submodules: recursive
 
       - name: Install AArch64 linker
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y gcc-aarch64-linux-gnu
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
       - name: Install Rust components
         run: rustup component add rust-src llvm-tools-preview
