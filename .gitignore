@@ -2,3 +2,4 @@ limine/
 build/
 target/
 .vscode/
+.workflow.txt
