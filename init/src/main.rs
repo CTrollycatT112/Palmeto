@@ -9,11 +9,14 @@
 #![no_std]
 #![no_main]
 
+//
+// !!! MODULES
+//
 mod reloc;
 mod mmdat;
-
 mod dtbinit;
 mod timinit;
+mod cmdinit;
 
 //
 // !!! KERNEL IMPORTS
@@ -22,14 +25,10 @@ use kernel::fbcon;
 use kernel::arch;
 use kernel::arch::arm64::assembly::instructions;
 
-use shared::core::requests::DATE_AT_BOOT_REQUEST;
 //
 // !!! SHARED IMPORTS
 //
-use shared::{debug, fatal, println};
-use shared::core::requests::{HHDM_REQUEST, 
-                             DTB_REQUEST, 
-                             CMDLINE_REQUEST};
+use shared::{println};
 
 //
 // !!! RUST IMPORTS
@@ -45,67 +44,31 @@ pub extern "C" fn _start() -> ! {
         reloc::apply_runtime_relocations(runtime_pc);
     }
 
+    //
+    // ARCHITECTURE INITALIZATION
+    //
     arch::init();
+
+    //
+    // FRAMEBUFFER CONSOLE INITIALIZATION
+    //
     fbcon::initialize();
     fbcon::reset_display();
 
-    let hhdm_offset = HHDM_REQUEST
-        .response()
-        .map(|r| r.offset)
-        .unwrap_or(0);
-
-    let mut serial_ok = false;
+    //
+    // DEVICE TREE BLOB INITIALIZATION
+    //
+    dtbinit::init().expect("Failed to initialize DTB...");
     
-    match DTB_REQUEST.response() 
-    {
-        Some(dtb_resp) => 
-        {
-            let dtb_ptr = dtb_resp.dtb_ptr as *const u8;
-
-            if let Ok(()) = dtbinit::init_dtb(dtb_ptr, hhdm_offset) {
-                serial_ok = true;
-            }
-
-            if !serial_ok
-            {
-                fatal!("COULD NOT FIND SERIAL IN DTB");
-            }
-        }
-        None => {
-            fatal!("COULD NOT GET DTB_RESPONSE");
-        }
-    }
-
-    if let Some(_) = DATE_AT_BOOT_REQUEST.response()
-    {
-        timinit::init_time();
-    } else {
-        fatal!("DATE_AT_BOOT_REQUEST INVALID..");
-    }
-
-    if let Some(cmd_response) = CMDLINE_REQUEST.response() {
-        let raw_ptr: *const u8 = cmd_response.cmdline().as_ptr();
-
-        if !raw_ptr.is_null() {
-            let mut len = 0;
-            unsafe {
-                while *raw_ptr.offset(len) != 0 {
-                    len += 1;
-                }
-                
-                let byte_slice = core::slice::from_raw_parts(raw_ptr, len as usize);
-                if let Ok(cmd_str) = core::str::from_utf8(byte_slice) {
-                    kernel::cmdline::parse_and_store(cmd_str);
-                    debug!("COMMAND LINE ARGUMENTS: {}", cmd_str);
-                }
-            }
-        }
-    }
-
-    let resp = HHDM_REQUEST.response().unwrap_or_else(|| {
-        fatal!("COULD NOT GET HHDM_RESPONSE");
-    });
-    let _ = resp.offset;
+    //
+    // TIMER INITIALIZATION
+    //
+    timinit::init_time();
+    
+    //
+    // COMMAND LINE INITIALIZATION
+    //
+    cmdinit::init();
 
     loop {
         core::hint::spin_loop();

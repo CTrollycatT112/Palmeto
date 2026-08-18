@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copyright (c) 2026 Trollycat
+//
+// Purpose: This module initializes the limine command line parser
+//
+use shared::{core::requests::CMDLINE_REQUEST, debug};
+
+pub fn init()
+{
+    if let Some(cmd_response) = CMDLINE_REQUEST.response() 
+    {
+        let raw_ptr: *const u8 = cmd_response.cmdline().as_ptr();
+
+        if !raw_ptr.is_null() 
+        {
+            let mut len = 0;
+
+            unsafe 
+            {
+                while *raw_ptr.offset(len) != 0 
+                {
+                    len += 1;
+                }
+                
+                let byte_slice = core::slice::from_raw_parts(raw_ptr, len as usize);
+                
+                if let Ok(cmd_str) = core::str::from_utf8(byte_slice) 
+                {
+                    kernel::cmdline::parse_and_store(cmd_str);
+                    debug!("COMMAND LINE ARGUMENTS: {}", cmd_str);
+                }
+            }
+        }
+    }
+}

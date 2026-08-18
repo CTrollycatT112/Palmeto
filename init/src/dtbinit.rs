@@ -12,9 +12,10 @@
 use drivers::tty::serial;
 use kernel::arch::arm64::exception::{timer, intrcntrl};
 
-use shared::core::status::{KResult, Status};
+use shared::{core::{requests::{DTB_REQUEST, HHDM_REQUEST}, 
+             status::{KResult, Status}}, fatal};
 
-pub fn init_dtb(dtb: *const u8, 
+fn internal_init_dtb(dtb: *const u8, 
                 hhdm_offset: u64
 ) -> KResult<()>  
 {
@@ -50,6 +51,27 @@ pub fn init_dtb(dtb: *const u8,
             timer::try_init_node(&node)?;
         }
     }
+
+    Ok(())
+}
+
+pub fn init() -> KResult<()>
+{
+    let hhdm_offset = HHDM_REQUEST
+        .response()
+        .map(|r| r.offset)
+        .unwrap_or(0);
+
+    let dtb_resp = match DTB_REQUEST.response() 
+    {
+        Some(resp) => resp,
+        None => {
+            fatal!("COULD NOT GET DTB_RESPONSE");
+        }
+    };
+
+    let dtb_ptr = dtb_resp.dtb_ptr as *const u8;
+    internal_init_dtb(dtb_ptr, hhdm_offset)?;
 
     Ok(())
 }
