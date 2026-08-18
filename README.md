@@ -1,4 +1,4 @@
-# Palmeto
+# Palmeto Operating System
 
 ![GitHub License](https://img.shields.io/github/license/CTrollycatT112/Palmeto?style=flat&color=green)
 ![GitHub Repo stars](https://img.shields.io/github/stars/CTrollycatT112/Palmeto?style=flat)
@@ -7,42 +7,49 @@
 
 Palmeto is an operating system targeting AArch64 Le Potato
 
-## Desktop focused
+## About Palmeto
 
-Palmeto is built as a desktop operating system, focusing on providing a Windows 11-like feel, just for $60
+Palmeto is a hobby operating system, meant to be used as a desktop operating system for the libre potato.
 
-Sounds crazy, but the kernel will be heavily optimized, I'll be doing all kinds of aggressive compression, swapping, and more to make sure 2GB of RAM is enough
+The libre potato is a small board that currently costs around 60$. There isn't much options for an operating system on such a cheap board, and people who don't know linux basically have 0.
+
+The goal for this project is to make a user friendly, Desktop-focused operating system.
 
 ## The kernel
 
-The design is mostly UNIX-focused, but more of a hybrid/safer version
+The palmeto kernel is designed to be a UNIX and NT hybrid. It will use NT style 'managers' for things such as:
 
-Certain things - like the CFS scheduler, have been removed in favor of MLFQ
+- Cache manager
+- I/O manager
+- Object Manager
 
-The kernel is designed to be lightweight, using smart compression and swapping for speed on low-end hardware
+It will use UNIX style for other things, such as interrupt handling, vfs, and more.
 
 ## Why even do this?
 
-Even though nobody would use this OS daily, I'm doing this purely for myself
+Even though nobody would use this OS daily, I'm doing this purely for myself.
 
-I have a desktop PC, so I don't need my Le Potato board. It would be such a cool thing to have my own OS running on it, and the learning you get from OS dev is unbeatable
+I have a desktop PC, so I don't need my Le Potato board. It would be such a cool thing to have my own OS running on it, and the learning you get from OS dev is unbeatable.
 
 ## AI help
 
-AI will not be used to generate any code for the O/S,
-as I want to learn, not copy...
+AI will not be used to generate any code for the O/S, as I want to learn, not copy...
 
 However, there is some cases where AI will be used:
 
-Build system - I don't know many standard build tools, ai will be used here
+- Build system - I don't know many standard build tools, ai will be used here
 
-Reviewing - It can review the code i write, spot any critical bugs, then i will fix them MYSELF
+- Reviewing - It can review the code i write, spot any critical bugs, then i will fix them
 
 ## Building and running the operating system
 
-Before running,make sure you have the tools Run `toolchain/check-deps.sh`
+Before running, make sure you have the tools by running:
 
-MAKE:
+```bash
+toolchain/check-deps.sh
+```
+
+Then you can use:
 
 ```bash
 make all
