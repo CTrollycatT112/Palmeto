@@ -24,7 +24,7 @@ I have a desktop PC, so I don't need my Le Potato board. It would be such a cool
 
 ## AI help
 
-AI will not be used to generate any code for the O/S, 
+AI will not be used to generate any code for the O/S,
 as I want to learn, not copy...
 
 However, there is some cases where AI will be used:
@@ -38,6 +38,7 @@ Reviewing - It can review the code i write, spot any critical bugs, then i will 
 Before running,make sure you have the tools Run `toolchain/check-deps.sh`
 
 MAKE:
+
 ```bash
 make all
 make run
