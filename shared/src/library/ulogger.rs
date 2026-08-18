@@ -112,14 +112,18 @@ macro_rules! log {
 #[macro_export]
 macro_rules! trace {
     ($($arg:tt)*) => {
-        $crate::log!($crate::library::ulogger::Level::Trace, $($arg)*)
+        if cfg!(debug_assertions) {
+            $crate::log!($crate::library::ulogger::Level::Trace, $($arg)*)
+        }
     };
 }
 
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        $crate::log!($crate::library::ulogger::Level::Debug, $($arg)*)
+        if cfg!(debug_assertions) {
+            $crate::log!($crate::library::ulogger::Level::Debug, $($arg)*)
+        }
     };
 }
 
