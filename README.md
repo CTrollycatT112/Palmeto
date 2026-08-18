@@ -1,5 +1,10 @@
 # Palmeto
 
+[![License](https://img.shields.io/github/license/CTrollycatT112/Palmeto)](https://github.com/CTrollycatT112/Palmeto/blob/main/LICENSE)
+[![Stars](https://img.shields.io/github/stars/CTrollycatT112/Palmeto)](https://github.com/CTrollycatT112/Palmeto/stargazers)
+[![Build](https://github.com/CTrollycatT112/Palmeto/actions/workflows/ci.yml/badge.svg)](https://github.com/CTrollycatT112/Palmeto/actions/workflows/ci.yml)
+[![Issues](https://img.shields.io/github/issues/CTrollycatT112/Palmeto)](https://github.com/CTrollycatT112/Palmeto/issues)
+
 Palmeto is an operating system targeting AArch64 Le Potato
 
 ## Desktop focused
