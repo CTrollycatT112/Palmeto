@@ -7,6 +7,8 @@
 //          this is the engine.. Simple enough?
 //
 
+#![allow(clippy::missing_safety_doc)]
+
 use spin::Mutex;
 
 use shared::core::requests::FRAMEBUFFER_REQUEST;

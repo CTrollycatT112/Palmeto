@@ -24,11 +24,14 @@ ISO          := $(PROFILE_DIR)/$(IMAGE_NAME).iso
 RUST_HOST    := $(shell rustc -vV | sed -n 's/host: //p')
 LLVM_OBJCOPY := $(shell rustc --print sysroot)/lib/rustlib/$(RUST_HOST)/bin/llvm-objcopy
 
-.PHONY: all build release deps check-deps install-deps scripts kernel limine image iso symbols run debug clean distclean ovmf
+.PHONY: all build release clippy deps check-deps install-deps scripts kernel limine image iso symbols run debug clean distclean ovmf
 
 all: image iso
 
 build: kernel
+
+clippy:
+	RUSTFLAGS="-Zunstable-options -A unused_features" cargo clippy --workspace -Zjson-target-spec -- --no-deps
 
 release:
 	$(MAKE) BUILD_PROFILE=release all

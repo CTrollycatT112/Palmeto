@@ -47,7 +47,7 @@ fn internal_init_dtb(dtb: *const u8,
 
     for node in fdt.all_nodes() {
         if let Some(mut registers) = node.reg() {
-            while let Some(register) = registers.next() {
+            for register in registers.by_ref() {
                 unsafe {
                     map_device_block(
                         register.starting_address as usize,
@@ -62,8 +62,8 @@ fn internal_init_dtb(dtb: *const u8,
 
     for node in fdt.all_nodes()
     {
-        if let Some(compatible) = node.compatible() {
-            if compatible.all().any(|c| intrcntrl::COMPATIBLE_STRINGS.contains(&c)) 
+        if let Some(compatible) = node.compatible()
+            && compatible.all().any(|c| intrcntrl::COMPATIBLE_STRINGS.contains(&c))
             {
                 intrcntrl::try_init_node(
                     &node,
@@ -73,7 +73,6 @@ fn internal_init_dtb(dtb: *const u8,
                 )?;
                 break;
             }
-        }
     }
 
     for node in fdt.all_nodes() {

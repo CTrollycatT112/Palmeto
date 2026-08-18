@@ -5,6 +5,10 @@ members = [
     "shared",
     "init",
 ]
+exclude = [
+    "bindings/flanterm-rs",
+    "bindings/limine-rs",
+]
 resolver = "2"
 
 [workspace.package]

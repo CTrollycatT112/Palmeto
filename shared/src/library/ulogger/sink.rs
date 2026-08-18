@@ -69,9 +69,7 @@ pub fn dispatch(data: &[u8]) {
 
     let sinks = SINKS.lock();
     
-    for slot in sinks.iter() {
-        if let Some(sink) = slot {
-            sink.write(data);
-        }
+    for sink in sinks.iter().filter_map(Option::as_ref) {
+        sink.write(data);
     }
 }

@@ -9,6 +9,7 @@
 //
 
 #![allow(unused)]
+#![allow(clippy::missing_safety_doc)]
 
 use super::instructions;
 
@@ -41,7 +42,7 @@ pub unsafe fn get_interrupt_state() -> bool
 {
     unsafe
     {
-        return instructions::interrupt_state();
+        instructions::interrupt_state()
     }
 }
 
@@ -52,7 +53,7 @@ pub unsafe fn toggle_interrupts(state: bool) -> bool
 {
     unsafe
     {
-        return instructions::toggle_interrupts(state);
+        instructions::toggle_interrupts(state)
     }
 }
 

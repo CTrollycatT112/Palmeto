@@ -18,6 +18,14 @@ pub struct RingBuffer<const CAPACITY: usize>
     full: bool,
 }
 
+impl<const CAPACITY: usize> Default for RingBuffer<CAPACITY>
+{
+    fn default() -> Self
+    {
+        Self::new()
+    }
+}
+
 impl<const CAPACITY: usize> RingBuffer<CAPACITY>
 {
     ///
@@ -172,6 +180,11 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
     pub fn empty(&self) -> bool
     {
         !self.full && self.head == self.tail
+    }
+
+    pub fn is_empty(&self) -> bool
+    {
+        self.empty()
     }
 
     ///

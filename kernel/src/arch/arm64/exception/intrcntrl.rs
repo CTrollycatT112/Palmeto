@@ -135,7 +135,8 @@ pub fn read_and_ack_interrupt() -> u32 {
 pub fn parse_interrupt(node: &fdt::node::FdtNode, index: usize) -> KResult<usize> 
 {
     let prop  = node.property("interrupts").ok_or(Status::FILE_CORRUPT_ERROR)?;
-    let chunk = prop.value.chunks_exact(12).nth(index).ok_or(Status::FILE_CORRUPT_ERROR)?;
+    let chunks = prop.value.as_chunks::<12>().0;
+    let chunk = chunks.get(index).ok_or(Status::FILE_CORRUPT_ERROR)?;
     
     let irq_type = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
     let irq_id   = u32::from_be_bytes([chunk[4], chunk[5], chunk[6], chunk[7]]) as usize;

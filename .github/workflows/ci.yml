@@ -27,5 +27,8 @@ jobs:
       - name: Check workspace
         run: cargo check --workspace -Zjson-target-spec
 
+      - name: Run Clippy
+        run: RUSTFLAGS="-Zunstable-options -A unused_features" cargo clippy --workspace -Zjson-target-spec -- --no-deps
+
       - name: Build kernel
         run: cargo build --profile dev -Zjson-target-spec

@@ -9,6 +9,7 @@
 //
 
 #![allow(unused)]
+#![allow(clippy::missing_safety_doc)]
 
 use core::arch::{asm, global_asm};
 

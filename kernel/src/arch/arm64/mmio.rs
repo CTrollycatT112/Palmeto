@@ -5,6 +5,7 @@
 //
 
 #![allow(unsafe_op_in_unsafe_fn)]
+#![allow(clippy::missing_safety_doc)]
 
 use core::ptr::{addr_of_mut, read_volatile, write_volatile};
 

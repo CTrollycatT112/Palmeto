@@ -31,6 +31,12 @@ impl<const N: usize> StackString<N> {
     }
 }
 
+impl<const N: usize> Default for StackString<N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<const N: usize> core::fmt::Write for StackString<N> {
 
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
@@ -63,7 +69,7 @@ pub fn __log(record: &LogRecord) {
     );
 
     let _ = core::fmt::write(&mut fmt_buf, record.args);
-    let _ = core::write!(&mut fmt_buf, "{}\n", crate::core::color::ANSI_RESET);
+    let _ = core::writeln!(&mut fmt_buf, "{}", crate::core::color::ANSI_RESET);
 
     dispatch(fmt_buf.as_bytes());
 }

@@ -50,7 +50,7 @@ impl<'a> CmdLine<'a>
 
             let start = idx;
             let end = self.data[start..]
-                .find(|c: char| c == '=' || c == ' ' || c == '\t')
+                .find(['=', ' ', '\t'])
                 .map(|i| start + i)
                 .unwrap_or(self.data.len());
 
@@ -81,7 +81,7 @@ impl<'a> CmdLine<'a>
                         .map(|i| val_start + i)
                         .unwrap_or(self.data.len()),
                     None => self.data[val_start..]
-                        .find(|c: char| c == ' ' || c == '\t')
+                        .find([' ', '\t'])
                         .map(|i| val_start + i)
                         .unwrap_or(self.data.len()),
                 };

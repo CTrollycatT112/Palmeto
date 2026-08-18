@@ -39,7 +39,7 @@ impl VirtAddr {
     /// This routine converts a virtual address to a mutable pointer.
     ///
     pub fn as_ptr<T>(self) -> *mut T {
-        return ptr::with_exposed_provenance_mut(self.0);
+        ptr::with_exposed_provenance_mut(self.0)
     }
 
     ///
@@ -114,9 +114,9 @@ macro_rules! addr_impl {
         }
 
         #[cfg(target_pointer_width = "64")]
-        impl Into<u64> for $ty {
-            fn into(self) -> u64 {
-                self.0 as u64
+        impl From<$ty> for u64 {
+            fn from(addr: $ty) -> u64 {
+                addr.0 as u64
             }
         }
 

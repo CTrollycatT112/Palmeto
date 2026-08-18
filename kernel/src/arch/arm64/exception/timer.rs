@@ -5,6 +5,8 @@
 // Purpose: ARM64 Generic Timer
 //
 
+#![allow(clippy::new_without_default)]
+
 use core::arch::asm;
 use spin::Mutex;
 
@@ -51,6 +53,12 @@ impl TimeState {
             slew_rem_us: 0,
             tz_offset_min: 0,
         }
+    }
+}
+
+impl Default for TimeState {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
