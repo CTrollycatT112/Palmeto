@@ -8,11 +8,10 @@ name = "palmeto"
 path = "src/main.rs"
 
 [dependencies]
-limine = { workspace = true }
-
-shared = { path = "../shared" }
-kernel = { path = "../kernel" }
+shared  = { path = "../shared" }
+kernel  = { path = "../kernel" }
 drivers = { path = "../drivers" }
 
-fdt = { workspace = true }
-spin = { workspace = true }
+limine  = { workspace = true }
+fdt     = { workspace = true }
+spin    = { workspace = true }

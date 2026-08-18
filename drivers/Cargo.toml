@@ -7,5 +7,5 @@ edition.workspace = true
 shared = { path = "../shared" }
 kernel = { path = "../kernel" }
 
-spin = { workspace = true }
-fdt  = { workspace = true }
+spin   = { workspace = true }
+fdt    = { workspace = true }
