@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // Purpose: 'API' for interrupt handling,
 //          We use a Dispatch table approach,

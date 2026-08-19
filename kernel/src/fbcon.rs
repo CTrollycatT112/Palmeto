@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // Purpose: This module acts as the public API for fbcon (framebuffer console),
 //          It provides the write methods, the initialization method, and more,
