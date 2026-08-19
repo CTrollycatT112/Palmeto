@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This file handles __stack related routines,
 //          This would've been unneeded,
 //          but flanterm for whatever reason relies on it,

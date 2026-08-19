@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module provides the font for the text,
 //          flanterm automatically provides a font,
 //          but it looks ugly on blue text,

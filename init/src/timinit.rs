@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module handles early time initialization,
 //          we can use the limine Time request,
 //          which tracks what time it is during boot.

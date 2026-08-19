@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This file uses raw assembly instructions,
 //          wrapping them in functions,
 //          AARCH64 instructions are a little weird..

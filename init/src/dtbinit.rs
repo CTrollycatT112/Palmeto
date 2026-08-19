@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module parses the Device tree blob,
 //          each module will handle it's own detection,
 //          but this will be an 'interface',

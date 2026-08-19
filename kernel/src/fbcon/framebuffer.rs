@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module implements the internal functions for the fbcon (framebuffer console),
 //          fbcon.rs is the public api,
 //          this is the engine.. Simple enough?

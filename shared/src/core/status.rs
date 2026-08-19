@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This kernel uses NTSTATUS style
 //          UNIX like systems commonly use 'ERRNO'
 //          There will be an ERRNO layer for system calls

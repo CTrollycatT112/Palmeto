@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This is the entry point file for the O/S,
 //          It contains "_start"
 //          It will handle VERY early initialization
