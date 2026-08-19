@@ -2,14 +2,15 @@
 //
 // Copyright (c) 2026 Trollycat
 //
-// Purpose: This module provides static ring buffers,
-//          for the ulogger..
+// Purpose: This module provides a static,
+//          fixed-capacity ring buffer.
+//
+//          A ring buffer uses a single,
+//          fixed-size array connected end-to-end,
+//          allowing data streaming (without memory management)
 //
 
-// I think it's normal to use them as static?
-// I could change this with heap allocation,
-// but from what i saw linux uses static ones..?
-
+use crate::core::status::{KResult, Status};
 pub struct RingBuffer<const CAPACITY: usize>
 {
     data: [u8; CAPACITY],
@@ -20,6 +21,10 @@ pub struct RingBuffer<const CAPACITY: usize>
 
 impl<const CAPACITY: usize> Default for RingBuffer<CAPACITY>
 {
+    ///
+    /// This routine returns a default, empty RingBuffer
+    /// It will invoke 'Self::new()'
+    ///
     fn default() -> Self
     {
         Self::new()
@@ -63,8 +68,10 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
     ///
     /// * bytes - A byte slice of data to write
     ///
-    pub fn write(&mut self, bytes: &[u8])
+    pub fn write(&mut self, bytes: &[u8]) -> KResult<()>
     {
+        let mut overflowed = false;
+
         for &b in bytes
         {
             self.data[self.head] = b;
@@ -73,11 +80,18 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
             if self.full
             {
                 self.tail = (self.tail + 1 ) % CAPACITY;
+                overflowed = true;
             } 
             else if self.head == self.tail 
             {
                 self.full = true;
             }
+        }
+
+        if overflowed {
+            Err(Status::BUFFER_OVERFLOW)
+        } else {
+            Ok(())
         }
     }
 
@@ -89,7 +103,7 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
     ///
     /// * byte - The single byte to push into the buffer
     ///
-    pub fn push(&mut self, byte: u8) -> bool
+    pub fn push(&mut self, byte: u8) -> KResult<()>
     {
 
         if self.full
@@ -98,22 +112,24 @@ impl<const CAPACITY: usize> RingBuffer<CAPACITY>
             // The buffer is full,
             // We cannot add anything more..
             //
-            return false;
+            Err(Status::BUFFER_OVERFLOW)
         }
+        else {
+            
+            self.data[self.head] = byte;
+            self.head            = (self.head + 1 ) % CAPACITY;
 
-        self.data[self.head] = byte;
-        self.head            = (self.head + 1 ) % CAPACITY;
+            if self.head == self.tail
+            {
+                //
+                // HEAD == TAIL
+                // This means the buffer is full
+                //
+                self.full = true;
+            }
 
-        if self.head == self.tail
-        {
-            //
-            // HEAD == TAIL
-            // This means the buffer is full
-            //
-            self.full = true;
+            Ok(())
         }
-
-        true
     }
 
     ///
@@ -214,7 +230,10 @@ impl<const CAPACITY: usize> core::fmt::Write for RingBuffer<CAPACITY> {
     /// * s - the string to write
     ///
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.write(s.as_bytes());
-        Ok(())
+        match self.write(s.as_bytes())
+        {
+            Ok(_) | Err(Status::BUFFER_OVERFLOW) => Ok(()),
+            Err(_) => Err(core::fmt::Error),
+        }
     }
 }
