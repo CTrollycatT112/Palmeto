@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // Purpose: This is really dumb..
 //          We don't yet have a heap allocator,

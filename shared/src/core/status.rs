@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // Purpose: This kernel uses NTSTATUS style
 //          UNIX like systems commonly use 'ERRNO'

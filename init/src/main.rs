@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // Purpose: This is the entry point file for the O/S,
 //          It contains "_start"
