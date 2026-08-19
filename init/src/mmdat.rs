@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module provides common memory-management data
 //
 use kernel::mm::PhysAddr;

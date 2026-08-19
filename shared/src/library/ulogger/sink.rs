@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: A 'sink' is the output target,
 //          for example,
 //          fbcon and serial will be registered as a 'sink',

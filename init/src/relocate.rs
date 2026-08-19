@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: Instead of booting from 0xffffffff80000000,
 //          modern kernels use 'relocation',
 //          the problem is hackers could easily attack,

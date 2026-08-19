@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module initializes the limine command line parser
 //
 use shared::{core::requests::CMDLINE_REQUEST, debug};

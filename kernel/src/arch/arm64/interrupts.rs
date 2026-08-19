@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: 'API' for interrupt handling,
 //          We use a Dispatch table approach,
 //          An interrupt will register itself (like the timer)

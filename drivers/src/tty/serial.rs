@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module act's as a shared UART driver,
 //          once we make more drivers or configure properly,
 //          we will split this up into an abstract module,

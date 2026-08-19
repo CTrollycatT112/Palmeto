@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This file has assembly instruction wrappers,
 //          for interrupt handling...
 //          instructions.rs already has assembly wrappers,

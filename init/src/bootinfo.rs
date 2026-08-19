@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This module handles early initialization,
 //          such as converting the memory map,
 //          storing BootInformation,

@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2026 Trollycat
-//
 // Purpose: This is where any exception handlers go,
 //          if you want a certain function called instead of panic,
 //          you register it here,
