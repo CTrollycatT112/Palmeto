@@ -1,3 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+//
+// Purpose: This module handles the serial driver for LIBRE POTATO BOARD (meson),
+//          we must seperate serial drivers from each other because they all (i think?) use different constants,
+//          although serial.rs will act as a shared super module,
+//          these just provide the implementation for their specific target (meson for example)
+//
 use super::SerialDevice;
 
 const REG_WFIFO:   usize   = 0x00;
@@ -24,17 +31,17 @@ impl MesonUart {
     unsafe fn reg_ptr(&self, offset: usize) -> *mut u32 {
         (self.vaddr as usize + offset) as *mut u32
     }
+}
 
-    pub fn init(&mut self) {
+impl SerialDevice for MesonUart {
+    fn init(&mut self) {
         unsafe {
             let ptr = self.reg_ptr(REG_CONTROL);
             let val = core::ptr::read_volatile(ptr);
             core::ptr::write_volatile(ptr, val | CONTROL_RESET_TX | CONTROL_RESET_RX);
         }
     }
-}
-
-impl SerialDevice for MesonUart {
+    
     fn write_byte(&mut self, byte: u8) {
         unsafe {
             while (core::ptr::read_volatile(self.reg_ptr(REG_STATUS)) & STATUS_TXFULL) != 0 {

@@ -1,3 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+//
+// Purpose: This module handles the serial driver for QEMU (pl011),
+//          we must seperate serial drivers from each other because they all (i think?) use different constants,
+//          although serial.rs will act as a shared super module,
+//          these just provide the implementation for their specific target (PL011 for example)
+//
+
 use super::SerialDevice;
 
 const REG_DR:    usize = 0x00;
@@ -30,8 +38,11 @@ impl Pl011Uart {
     unsafe fn reg_ptr(&self, offset: usize) -> *mut u32 {
         (self.vaddr as usize + offset) as *mut u32
     }
+}
 
-    pub fn init(&mut self) {
+impl SerialDevice for Pl011Uart {
+    fn init(&mut self)
+    {
         unsafe {
             core::ptr::write_volatile(self.reg_ptr(REG_CR), 0);
             core::ptr::write_volatile(self.reg_ptr(REG_IBRD), 13);
@@ -40,9 +51,7 @@ impl Pl011Uart {
             core::ptr::write_volatile(self.reg_ptr(REG_CR), CR_UARTEN | CR_TXE | CR_RXE);
         }
     }
-}
 
-impl SerialDevice for Pl011Uart {
     fn write_byte(&mut self, byte: u8) {
         unsafe {
             while (core::ptr::read_volatile(self.reg_ptr(REG_FR)) & FR_TXFF) != 0 {

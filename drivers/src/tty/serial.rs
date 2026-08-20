@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //
-// Purpose: This module act's as a shared UART driver,
-//          once we make more drivers or configure properly,
-//          we will split this up into an abstract module,
-//          but for now this file handles the 2 UART drivers.
-//          it's chosen by the DTB,
-//          wether to use 'PL011' or 'S905X'
+// Purpose: This module is the core for the serial drivers,
+//          it will handle detection,
+//          initialization,
+//          shared functions,
+//          and more.
 //
 
 //
 // !!! MODULES
 //
 pub mod meson_uart;
-pub mod pl011uart;
+pub mod pl011_uart;
 
 //
 // !!! LIBRARY IMPORTS
@@ -49,6 +48,12 @@ pub const COMPATIBLE_STRINGS: &[&str] = &
 
 pub trait SerialDevice: Send + Sync {
 
+    ///
+    /// This routine performs setup for the UART before it's usable
+    /// (BAUD RATE, FIFO config, etc..)
+    ///
+    fn init(&mut self);
+    
     ///
     /// This routines writes a single byte to the hardware.
     ///
@@ -92,11 +97,21 @@ pub trait SerialDevice: Send + Sync {
 //  ONCE WE HAVE OUR HEAP ALLOCATOR..
 //
 pub enum ActiveSerial {
-    Pl011(pl011uart::Pl011Uart),
+    Pl011(pl011_uart::Pl011Uart),
     Meson(meson_uart::MesonUart),
 }
 
 impl SerialDevice for ActiveSerial {
+
+    fn init(&mut self) 
+    {
+        match self 
+        {
+            Self::Pl011(uart) => uart.init(),
+            Self::Meson(uart) => uart.init(),
+        }
+    }
+
     fn write_byte(&mut self, byte: u8) {
         match self {
             Self::Pl011(uart) => uart.write_byte(byte),
@@ -160,6 +175,24 @@ pub static SERIAL_RX_BUFFER: Mutex<RingBuffer<512>>      = Mutex::new(RingBuffer
 pub static SERIAL_SINK: SerialSink = SerialSink;
 
 ///
+/// This routine performs the common bring-up shared by UART;
+/// 
+/// init hardware,
+/// enable interrupts,
+/// wrap in ActiveSerial for the caller..
+///
+/// # Arguments
+///
+/// * uart - The uart device to initialize
+/// * wrap - Closer that takes ownership of D
+fn bring_up<D: SerialDevice>(mut uart: D, wrap: impl FnOnce(D) -> ActiveSerial) -> ActiveSerial
+{
+    uart.init();
+    uart.enable_interrupts();
+    wrap(uart)
+}
+
+///
 /// This routines initializes a serial device,
 /// using the configuration found in the device tree node.
 ///
@@ -187,19 +220,13 @@ pub fn try_init_node(node: &fdt::node::FdtNode, vaddr: u64) -> KResult<()>
         {
             "arm,pl011" => 
             {
-                let mut uart = pl011uart::Pl011Uart::new(base_vaddr);
-                uart.init();
-                uart.enable_interrupts();
-                device = Some(ActiveSerial::Pl011(uart));
+                device = Some(bring_up(pl011_uart::Pl011Uart::new(base_vaddr), ActiveSerial::Pl011));
                 break;
             }
 
             "amlogic,meson-gx-uart" | "amlogic,meson-s905-uart" => 
             {
-                let mut uart = meson_uart::MesonUart::new(base_vaddr);
-                uart.init();
-                uart.enable_interrupts();
-                device = Some(ActiveSerial::Meson(uart));
+                device = Some(bring_up(meson_uart::MesonUart::new(base_vaddr), ActiveSerial::Meson));
                 break;
             }
 
